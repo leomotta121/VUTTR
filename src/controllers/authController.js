@@ -8,7 +8,7 @@ exports.postSignUp = async (req, res, next) => {
     const { name, lastName, email, password } = req.body;
 
     if (!name || !lastName || !email || !password) {
-      const error = new Error('Por favor preencha todos os campos.');
+      const error = new Error('Required field is missing.');
       error.status = 400;
       throw error;
     }
