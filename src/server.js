@@ -17,4 +17,7 @@ server.listen(port, () => {
   console.log(`listening on ${port}`);
 });
 
-module.exports = server;
+module.exports = {
+  server: server,
+  mongoose: mongoose
+};
