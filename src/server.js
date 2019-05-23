@@ -8,7 +8,7 @@ mongoose.set('useCreateIndex', true);
 const app = require('./app');
 const server = http.createServer(app);
 
-mongoose.connect(MONGODB, { useNewUrlParser: true });
+mongoose.connect(MONGODB, { useNewUrlParser: true, useFindAndModify: false });
 mongoose.connection
   .once('open', () => console.log('connected to databse'))
   .on('error', error => console.warn('error: ' + error));
