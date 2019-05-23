@@ -1,4 +1,5 @@
-const MONGODB = 'mongodb://localhost:27017/vttr';
+const MONGODB = 'mongodb://localhost:27017/vuttr';
+const port = 3000;
 
 const http = require('http');
 const mongoose = require('mongoose').set('debug', true);
@@ -12,8 +13,8 @@ mongoose.connection
   .once('open', () => console.log('connected to databse'))
   .on('error', error => console.warn('error: ' + error));
 
-server.listen(3000, () => {
-  console.log('server listening on port 3000...');
+server.listen(port, () => {
+  console.log(`listening on ${port}`);
 });
 
 module.exports = server;

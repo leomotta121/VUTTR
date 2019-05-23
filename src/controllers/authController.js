@@ -3,6 +3,12 @@ const crypto = require('crypto');
 
 const User = require('../models/user');
 
+exports.getTest = (req, res, next) => {
+  return res.status(200).json({
+    message: 'It works'
+  });
+};
+
 exports.postSignUp = async (req, res, next) => {
   try {
     const { name, lastName, email, password } = req.body;
