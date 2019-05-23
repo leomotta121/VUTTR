@@ -1,6 +1,6 @@
 # VUTTR
 
-This is a project done for [BossaBox](https://bossabox.com) challenge
+This is a project done for [BossaBox](https://bossabox.com)' challenge
 
 ## Instructions:
 
