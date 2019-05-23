@@ -3,12 +3,6 @@ const crypto = require('crypto');
 
 const User = require('../models/user');
 
-exports.getTest = (req, res, next) => {
-  return res.status(200).json({
-    message: 'It works'
-  });
-};
-
 exports.postSignUp = async (req, res, next) => {
   try {
     const { name, lastName, email, password } = req.body;
@@ -37,6 +31,37 @@ exports.postSignUp = async (req, res, next) => {
     return res.status(201).json({
       message: 'User created.'
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+exports.postSignIn = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      const error = new Error('Required field is missing.');
+      error.status = 400;
+      throw error;
+    }
+
+    const user = await User.findOne({ email }).select('+password');
+
+    let isEqual;
+    if (user) {
+      isEqual = await bcrypt.compare(password, user.password);
+    }
+
+    if (!user || !isEqual) {
+      const error = new Error('Invalid password.');
+      error.status = 400;
+      throw error;
+    }
+
+    const token = user.getToken();
+
+    return res.status(200).json({ userId: user._id, token: token });
   } catch (error) {
     next(error);
   }

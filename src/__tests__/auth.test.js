@@ -51,5 +51,44 @@ describe('Auth test', () => {
           .expect(400);
       });
     });
+
+    describe('/signin', () => {
+      it('Sign In a user', async () => {
+        const user = new User({
+          name: 'Diane',
+          lastName: 'Castro',
+          email: 'test3@test.com',
+          password: '123456'
+        });
+        await user.save();
+
+        await request(app)
+          .post('/v1/auth/signin')
+          .send({ email: 'test3@test.com', password: '123456' })
+          .expect(200);
+      });
+
+      it('Bad password', async () => {
+        const user = new User({
+          name: 'Diane',
+          lastName: 'Castro',
+          email: 'test4@test.com',
+          password: '123456'
+        });
+        await user.save();
+
+        await request(app)
+          .post('/v1/auth/signin')
+          .send({ email: 'test4@test.com', password: '1234536' })
+          .expect(400);
+      });
+
+      it('Field is missing', async () => {
+        await request(app)
+          .post('/v1/auth/signin')
+          .send({ email: 'test3@test.com' })
+          .expect(400);
+      });
+    });
   });
 });
