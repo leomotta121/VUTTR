@@ -1,17 +1,13 @@
-// Built in node
-const http = require('http');
-
 // Third part libs
 const express = require('express');
 const bodyParser = require('body-parser');
 const passport = require('passport');
 const cors = require('cors');
-const mongoose = require('mongoose');
-
-// Require Routes
 
 const app = express();
-const server = http.createServer(app);
+
+// Require Routes
+const v1 = require('./routes/v1');
 
 // Middlerwares
 app.use(cors);
@@ -21,18 +17,19 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(passport.initialize());
 
-mongoose
-  .connect(
-    `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@cluster0-sud5s.mongodb.net/${
-      process.env.DB_NAME
-    }`,
-    { useNewUrlParser: true, useFindAndModify: false, useCreateIndex: true }
-  )
-  .then(result => {
-    server.listen(process.env.PORT || 8080, () => {
-      console.log(`App listening on port ${process.env.PORT || 8080}`);
-    });
-  })
-  .catch(error => {
-    console.log(error);
-  });
+// Catch 404
+app.use((req, res, next) => {
+  const error = new Error('Route not found.');
+  error.status = 404;
+  next(error);
+});
+
+// Catch errors
+app.use((error, req, res, next) => {
+  console.log(error);
+  const status = error.status || 500;
+  const message = error.message;
+  res.status(status).json({ message: message, status: status });
+});
+
+module.exports = app;
