@@ -169,5 +169,13 @@ describe('Tool test', () => {
           .expect(400);
       });
     });
+
+    describe('/fetchtools', () => {
+      it('Fetch all tools', async () => {
+        await request(app)
+          .get('/v1/tool/fetchtools')
+          .expect(200);
+      });
+    });
   });
 });
