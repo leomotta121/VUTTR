@@ -1,7 +1,5 @@
 const factory = require('../factory');
 const app = require('../../app');
-const User = require('../../models/user');
-const Tool = require('../../models/tool');
 const request = require('supertest');
 const mongoose = require('mongoose');
 const mongoDB = 'mongodb://localhost:27017/vuttrtest';
