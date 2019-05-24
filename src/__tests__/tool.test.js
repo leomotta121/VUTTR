@@ -170,10 +170,10 @@ describe('Tool test', () => {
       });
     });
 
-    describe('/fetchtools', () => {
+    describe('/tools', () => {
       it('Fetch all tools', async () => {
         await request(app)
-          .get('/v1/tool/fetchtools')
+          .get('/v1/tool/tools')
           .expect(200);
       });
     });

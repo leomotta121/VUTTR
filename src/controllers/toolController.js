@@ -2,7 +2,20 @@ const Tool = require('../models/tool');
 
 exports.getTools = async (req, res, next) => {
   try {
-    const tools = await Tool.find();
+    const tag = req.query.tag;
+
+    if (!tag) {
+      const tools = await Tool.find();
+      return res.status(200).json(tools);
+    }
+
+    const tools = await Tool.find({ tags: tag });
+
+    if (!tools) {
+      const error = new Error('Could not find any tool.');
+      error.status = 400;
+      throw error;
+    }
 
     return res.status(200).json(tools);
   } catch (error) {
