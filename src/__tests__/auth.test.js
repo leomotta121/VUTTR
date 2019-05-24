@@ -33,14 +33,14 @@ describe('Auth test', () => {
         const user = new User({
           name: 'Diane',
           lastName: 'Castro',
-          email: 'test@test.com',
+          email: 'test2@test.com',
           password: '123456'
         });
         await user.save();
 
         await request(app)
           .post('/v1/auth/signup')
-          .send({ name: 'Diane', lastName: 'Castro', email: 'test@test.com', password: '123456' })
+          .send({ name: 'Diane', lastName: 'Castro', email: 'test2@test.com', password: '123456' })
           .expect(400);
       });
 

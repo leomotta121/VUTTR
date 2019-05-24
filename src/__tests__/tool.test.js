@@ -1,5 +1,4 @@
 const app = require('../app');
-const Tool = require('../models/tool');
 const User = require('../models/user');
 const request = require('supertest');
 const mongoose = require('mongoose');

@@ -1,6 +1,4 @@
-const MONGODB = 'mongodb://localhost:27017/vuttrtest';
 const app = require('../app');
-const mongoose = require('mongoose');
 const request = require('supertest');
 
 describe('App.js test', () => {

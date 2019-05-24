@@ -8,6 +8,9 @@ const toolController = require('../../controllers/toolController');
 const passport = require('passport');
 require('../../middlewares/passport')(passport);
 
+// /v1/tool/fetchtools
+router.get('/fetchtools', toolController.getTools);
+
 // /v1/tool/register
 router.post('/register', isAuth, toolController.postTool);
 

@@ -1,11 +1,27 @@
 const Tool = require('../models/tool');
 
+exports.getTools = async (req, res, next) => {
+  try {
+    const tools = await Tool.find();
+
+    return res.status(200).json(tools);
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.postTool = async (req, res, next) => {
   try {
     const { title, link, description, tags } = req.body;
 
     if (!title || !link || !description || !tags) {
       const error = new Error('Required field is missing.');
+      error.status = 400;
+      throw error;
+    }
+
+    if (await Tool.findOne({ title })) {
+      const error = new Error('Tool registered.');
       error.status = 400;
       throw error;
     }
