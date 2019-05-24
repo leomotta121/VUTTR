@@ -20,11 +20,11 @@ describe('Auth test', () => {
     return done();
   });
 
-  describe('test /v1/auth/... routes', () => {
+  describe('test auth routes', () => {
     describe('/signup', () => {
       it('sign up a user', async () => {
         await request(app)
-          .post('/v1/auth/signup')
+          .post('/signup')
           .send({ name: 'Leo', lastName: 'Motta', email: 'test2@test.com', password: '123456' })
           .expect(201);
       });
@@ -39,14 +39,14 @@ describe('Auth test', () => {
         await user.save();
 
         await request(app)
-          .post('/v1/auth/signup')
+          .post('/signup')
           .send({ name: 'Diane', lastName: 'Castro', email: 'test2@test.com', password: '123456' })
           .expect(400);
       });
 
       it('missing field', async () => {
         await request(app)
-          .post('/v1/auth/signup')
+          .post('/signup')
           .send({ name: 'Leo' })
           .expect(400);
       });
@@ -63,7 +63,7 @@ describe('Auth test', () => {
         await user.save();
 
         await request(app)
-          .post('/v1/auth/signin')
+          .post('/signin')
           .send({ email: 'test3@test.com', password: '123456' })
           .expect(200);
       });
@@ -78,14 +78,14 @@ describe('Auth test', () => {
         await user.save();
 
         await request(app)
-          .post('/v1/auth/signin')
+          .post('/signin')
           .send({ email: 'test4@test.com', password: '1234536' })
           .expect(400);
       });
 
       it('Field is missing', async () => {
         await request(app)
-          .post('/v1/auth/signin')
+          .post('/signin')
           .send({ email: 'test3@test.com' })
           .expect(400);
       });

@@ -56,10 +56,12 @@ exports.postTool = async (req, res, next) => {
 
 exports.deleteTool = async (req, res, next) => {
   try {
-    const { id } = req.body;
+    const id = req.params.id;
 
-    if (!id) {
-      const error = new Error('Required field is missing.');
+    const tool = await Tool.findById(id);
+
+    if (!tool) {
+      const error = new Error('Could not find any tool.');
       error.status = 400;
       throw error;
     }

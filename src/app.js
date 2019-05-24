@@ -20,7 +20,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use(passport.initialize());
 
-app.use('/v1', v1);
+app.use(v1);
 
 // Catch 404
 app.use((req, res, next) => {

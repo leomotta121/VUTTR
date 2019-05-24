@@ -21,7 +21,7 @@ describe('Tool test', () => {
     return done();
   });
 
-  describe('test /v1/tool/... routes', () => {
+  describe('test tools routes', () => {
     describe('/register', () => {
       it('register a tool', async () => {
         const user = new User({
@@ -33,13 +33,13 @@ describe('Tool test', () => {
         await user.save();
 
         const response = await request(app)
-          .post('/v1/auth/signin')
+          .post('/signin')
           .send({ email: user.email, password: '123456' });
 
         const token = response.body.token;
 
         await request(app)
-          .post('/v1/tool/register')
+          .post('/tools')
           .set('Authorization', `Bearer ${token}`)
           .send({
             title: 'express',
@@ -61,13 +61,13 @@ describe('Tool test', () => {
         await user.save();
 
         const response = await request(app)
-          .post('/v1/auth/signin')
+          .post('/signin')
           .send({ email: user.email, password: '123456' });
 
         const token = response.body.token;
 
         await request(app)
-          .post('/v1/tool/register')
+          .post('/tools')
           .set('Authorization', `Bearer ${token}`)
           .send({
             link: 'https://expressjs.com/',
@@ -98,13 +98,13 @@ describe('Tool test', () => {
         expressTool.save();
 
         const response = await request(app)
-          .post('/v1/auth/signin')
+          .post('/signin')
           .send({ email: user.email, password: '123456' });
 
         const token = response.body.token;
 
         await request(app)
-          .post('/v1/tool/register')
+          .post('/tools')
           .set('Authorization', `Bearer ${token}`)
           .send(express)
           .expect(400);
@@ -122,13 +122,13 @@ describe('Tool test', () => {
         await user.save();
 
         const signedUser = await request(app)
-          .post('/v1/auth/signin')
+          .post('/signin')
           .send({ email: user.email, password: '123456' });
 
         const token = signedUser.body.token;
 
         const tool = await request(app)
-          .post('/v1/tool/register')
+          .post('/tools')
           .set('Authorization', `Bearer ${token}`)
           .send({
             title: 'hotel',
@@ -141,13 +141,12 @@ describe('Tool test', () => {
         const toolId = tool.body._id;
 
         await request(app)
-          .delete('/v1/tool/delete')
+          .delete(`/tools/${toolId}`)
           .set('Authorization', `Bearer ${token}`)
-          .send({ id: toolId })
           .expect(200);
       });
 
-      it('missing id', async () => {
+      it('tool not registered', async () => {
         const user = new User({
           name: 'Diane',
           lastName: 'Castro',
@@ -157,15 +156,14 @@ describe('Tool test', () => {
         await user.save();
 
         const signedUser = await request(app)
-          .post('/v1/auth/signin')
+          .post('/signin')
           .send({ email: user.email, password: '123456' });
 
         const token = signedUser.body.token;
 
         await request(app)
-          .delete('/v1/tool/delete')
+          .delete('/tools/5ce7baf17b521d2b0c21d0b6')
           .set('Authorization', `Bearer ${token}`)
-          .send({})
           .expect(400);
       });
     });
@@ -173,7 +171,7 @@ describe('Tool test', () => {
     describe('/tools', () => {
       it('Fetch all tools', async () => {
         await request(app)
-          .get('/v1/tool/tools')
+          .get('/tools')
           .expect(200);
       });
 
@@ -188,13 +186,13 @@ describe('Tool test', () => {
         expressTool.save();
 
         await request(app)
-          .get('/v1/tool/tools?tag=node')
+          .get('/tools?tag=node')
           .expect(200);
       });
 
       it('Could not find any tool.', async () => {
         await request(app)
-          .get('/v1/tool/tools?tag=node')
+          .get('/tools?tag=node')
           .expect(400);
       });
     });
