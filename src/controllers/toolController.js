@@ -11,7 +11,7 @@ exports.getTools = async (req, res, next) => {
 
     const tools = await Tool.find({ tags: tag });
 
-    if (!tools) {
+    if (tools.length <= 0) {
       const error = new Error('Could not find any tool.');
       error.status = 400;
       throw error;

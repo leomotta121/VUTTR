@@ -176,6 +176,27 @@ describe('Tool test', () => {
           .get('/v1/tool/tools')
           .expect(200);
       });
+
+      it('Fetch all tools by tag', async () => {
+        const expressTool = new Tool({
+          title: 'express',
+          link: 'https://expressjs.com/',
+          description:
+            'Express is a minimal and flexible Node.js web application framework that provides a robust set of features for web and mobile applications.',
+          tags: ['node', 'framework']
+        });
+        expressTool.save();
+
+        await request(app)
+          .get('/v1/tool/tools?tag=node')
+          .expect(200);
+      });
+
+      it('Could not find any tool.', async () => {
+        await request(app)
+          .get('/v1/tool/tools?tag=node')
+          .expect(400);
+      });
     });
   });
 });
