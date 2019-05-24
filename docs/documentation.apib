@@ -25,10 +25,50 @@ this is VUTTR api documentation
 ### Sign in an user [POST]
 + Request (application/json)
     + Attributes
-        + email: test@test.com (string)
-        + password: 123456 (string)
+        + email: test@test.com (string, required)
+        + password: 123456 (string, required)
 
 + Response 200 (application/json)
     + Attributes
         + userId: 5ce718e91f92721d59bf12c0 (string)
         + token: eyJhbGciOiJIUzI1NiIsInR5c (string)
+
+# Group Tools
+
+## Tool Collection [/tools]
+
+### Get all tools [GET]
++ Response 200 (application/json)
+    + Attributes (array[Tool])
+
+### Get all tools by tag [GET /tools?tag=node]
++ Response 200 (application/json)
+    + Attributes (array[Tool])
+
+### Post a tool [POST]
++ Request (application/json)
+    + Attributes (Tool request)
+
++ Response 201 (application/json)
+    + Attributes (Tool)
+
+### Delete tools [DELETE /tools/:id]
++ Response 200
+
+## Data Structures
+
+### Tool
++ _id: 5ce718e91f92721d59bf12c0 (string, required)
++ title: express (string, required)
++ link: express.com (string, required)
++ description: tool description (string, required)
++ tags (array[Tags], required)
+
+### Tool request
++ title: express (string, required)
++ link: express.com (string, required)
++ description: tool description (string, required)
++ tags (array[Tags], required)
+
+### Tags
++ tags: Node, Framework (required)

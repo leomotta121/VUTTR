@@ -22,7 +22,7 @@ describe('Tool test', () => {
   });
 
   describe('test tools routes', () => {
-    describe('/register', () => {
+    describe('creat tool', () => {
       it('register a tool', async () => {
         const user = new User({
           name: 'Diane',
