@@ -1,0 +1,34 @@
+FORMAT: 1A
+
+# VUTTR
+
+this is VUTTR api documentation
+
+# Group Auth
+
+## Sign up Collection [/signup]
+
+### Sign up an user [POST]
++ Request (application/json)
+    + Attributes
+        + name: Leo (string, required)
+        + lastName: Motta (string, required)
+        + email: test@test.com (string, required)
+        + password: 123456 (string, required)
+        
++ Response 201 (application/json)
+    + Attributes
+        + message: User created. (string)
+
+## Sign in Collection [/signin]
+
+### Sign in an user [POST]
++ Request (application/json)
+    + Attributes
+        + email: test@test.com (string)
+        + password: 123456 (string)
+
++ Response 200 (application/json)
+    + Attributes
+        + userId: 5ce718e91f92721d59bf12c0 (string)
+        + token: eyJhbGciOiJIUzI1NiIsInR5c (string)
