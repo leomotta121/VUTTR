@@ -1,3 +1,7 @@
+require('dotenv').config({
+  path: '.env'
+});
+
 // Third part libs
 const express = require('express');
 const bodyParser = require('body-parser');

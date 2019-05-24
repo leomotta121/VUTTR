@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-const secret = require('../scretOrKey').secret;
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
@@ -43,7 +42,7 @@ UserSchema.pre('save', async function(next) {
 });
 
 UserSchema.methods.getToken = function() {
-  return jwt.sign({ userId: this._id }, secret, {
+  return jwt.sign({ userId: this._id }, process.env.PASSPORT_SECRET, {
     expiresIn: '5h'
   });
 };

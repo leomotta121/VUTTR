@@ -1,6 +1,7 @@
-const app = require('../app');
-const User = require('../models/user');
-const Tool = require('../models/tool');
+const factory = require('../factory');
+const app = require('../../app');
+const User = require('../../models/user');
+const Tool = require('../../models/tool');
 const request = require('supertest');
 const mongoose = require('mongoose');
 const mongoDB = 'mongodb://localhost:27017/vuttrtest';
@@ -24,13 +25,7 @@ describe('Tool test', () => {
   describe('test tools routes', () => {
     describe('creat tool', () => {
       it('register a tool', async () => {
-        const user = new User({
-          name: 'Diane',
-          lastName: 'Castro',
-          email: 'test@test.com',
-          password: '123456'
-        });
-        await user.save();
+        const user = await factory.create('User', { password: '123456' });
 
         const response = await request(app)
           .post('/signin')
@@ -52,13 +47,7 @@ describe('Tool test', () => {
       });
 
       it('missing field', async () => {
-        const user = new User({
-          name: 'Diane',
-          lastName: 'Castro',
-          email: 'test5@test.com',
-          password: '123456'
-        });
-        await user.save();
+        const user = await factory.create('User', { password: '123456' });
 
         const response = await request(app)
           .post('/signin')
@@ -79,23 +68,9 @@ describe('Tool test', () => {
       });
 
       it('registered tool', async () => {
-        const user = new User({
-          name: 'Diane',
-          lastName: 'Castro',
-          email: 'test5@test.com',
-          password: '123456'
-        });
-        await user.save();
+        const user = await factory.create('User', { password: '123456' });
 
-        const express = {
-          title: 'express',
-          link: 'https://expressjs.com/',
-          description:
-            'Express is a minimal and flexible Node.js web application framework that provides a robust set of features for web and mobile applications.',
-          tags: ['node', 'framework']
-        };
-        const expressTool = new Tool(express);
-        expressTool.save();
+        const tool = await factory.create('Tool');
 
         const response = await request(app)
           .post('/signin')
@@ -106,20 +81,14 @@ describe('Tool test', () => {
         await request(app)
           .post('/tools')
           .set('Authorization', `Bearer ${token}`)
-          .send(express)
+          .send(tool)
           .expect(400);
       });
     });
 
     describe('/delete', () => {
       it('delete a tool', async () => {
-        const user = new User({
-          name: 'Diane',
-          lastName: 'Castro',
-          email: 'test@test.com',
-          password: '123456'
-        });
-        await user.save();
+        const user = await factory.create('User', { password: '123456' });
 
         const signedUser = await request(app)
           .post('/signin')
@@ -127,33 +96,16 @@ describe('Tool test', () => {
 
         const token = signedUser.body.token;
 
-        const tool = await request(app)
-          .post('/tools')
-          .set('Authorization', `Bearer ${token}`)
-          .send({
-            title: 'hotel',
-            link: 'https://github.com/typicode/hotel',
-            description:
-              'Local app manager. Start apps within your browser, developer tool with local .localhost domain and https out of the box.',
-            tags: ['node', 'organizing', 'webapps', 'domain', 'developer', 'https', 'proxy']
-          });
-
-        const toolId = tool.body._id;
+        const tool = await factory.create('Tool');
 
         await request(app)
-          .delete(`/tools/${toolId}`)
+          .delete(`/tools/${tool._id}`)
           .set('Authorization', `Bearer ${token}`)
           .expect(200);
       });
 
       it('tool not registered', async () => {
-        const user = new User({
-          name: 'Diane',
-          lastName: 'Castro',
-          email: 'test@test.com',
-          password: '123456'
-        });
-        await user.save();
+        const user = await factory.create('User', { password: '123456' });
 
         const signedUser = await request(app)
           .post('/signin')
@@ -176,17 +128,10 @@ describe('Tool test', () => {
       });
 
       it('Fetch all tools by tag', async () => {
-        const expressTool = new Tool({
-          title: 'express',
-          link: 'https://expressjs.com/',
-          description:
-            'Express is a minimal and flexible Node.js web application framework that provides a robust set of features for web and mobile applications.',
-          tags: ['node', 'framework']
-        });
-        expressTool.save();
+        const tool = await factory.create('Tool');
 
         await request(app)
-          .get('/tools?tag=node')
+          .get(`/tools?tag=${tool.tags[0]}`)
           .expect(200);
       });
 

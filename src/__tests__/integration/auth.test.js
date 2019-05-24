@@ -1,5 +1,5 @@
-const app = require('../app');
-const User = require('../models/user');
+const factory = require('../factory');
+const app = require('../../app');
 const request = require('supertest');
 const mongoose = require('mongoose');
 const mongoDB = 'mongodb://localhost:27017/vuttrtest';
@@ -30,17 +30,11 @@ describe('Auth test', () => {
       });
 
       it('refuse user already created', async () => {
-        const user = new User({
-          name: 'Diane',
-          lastName: 'Castro',
-          email: 'test2@test.com',
-          password: '123456'
-        });
-        await user.save();
+        const user = await factory.create('User');
 
         await request(app)
           .post('/signup')
-          .send({ name: 'Diane', lastName: 'Castro', email: 'test2@test.com', password: '123456' })
+          .send({ name: user.name, lastName: user.lastName, email: user.email, password: '123456' })
           .expect(400);
       });
 
@@ -54,32 +48,20 @@ describe('Auth test', () => {
 
     describe('/signin', () => {
       it('Sign In a user', async () => {
-        const user = new User({
-          name: 'Diane',
-          lastName: 'Castro',
-          email: 'test3@test.com',
-          password: '123456'
-        });
-        await user.save();
+        const user = await factory.create('User', { password: '123456' });
 
         await request(app)
           .post('/signin')
-          .send({ email: 'test3@test.com', password: '123456' })
+          .send({ email: user.email, password: '123456' })
           .expect(200);
       });
 
       it('Bad password', async () => {
-        const user = new User({
-          name: 'Diane',
-          lastName: 'Castro',
-          email: 'test4@test.com',
-          password: '123456'
-        });
-        await user.save();
+        const user = await factory.create('User');
 
         await request(app)
           .post('/signin')
-          .send({ email: 'test4@test.com', password: '1234536' })
+          .send({ email: user.email, password: '1234536' })
           .expect(400);
       });
 
