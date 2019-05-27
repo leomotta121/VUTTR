@@ -52,7 +52,7 @@ exports.postSignIn = async (req, res, next) => {
     }
 
     if (!user || !isEqual) {
-      const error = new Error('Invalid password.');
+      const error = new Error('Invalid password or email.');
       error.status = 400;
       throw error;
     }

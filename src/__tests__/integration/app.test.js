@@ -9,7 +9,7 @@ describe('App.js test', () => {
   let server;
 
   beforeAll(() => {
-    server = app.listen(3000, () => console.log('listening port 3000'));
+    server = app.listen(3001, () => console.log('listening port 3001'));
   });
 
   afterAll(done => {
