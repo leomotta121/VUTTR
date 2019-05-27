@@ -54,6 +54,49 @@ exports.postTool = async (req, res, next) => {
   }
 };
 
+exports.patchTool = async (req, res, next) => {
+  try {
+    const { title, link, description, tags } = req.body;
+    const { id } = req.params;
+
+    if (!title && !link && !description && !tags) {
+      const error = new Error('Nothing to edit.');
+      error.status = 400;
+      throw error;
+    }
+
+    if (!Array.isArray(tags)) {
+      const error = new Error('Tags most be an array.');
+      error.status = 400;
+      throw error;
+    }
+
+    const tool = await Tool.findById(id);
+
+    if (!tool) {
+      const error = new Error('Could not find any tool.');
+      error.status = 400;
+      throw error;
+    }
+
+    if (title) tool.title = title;
+    if (link) tool.link = link;
+    if (description) tool.description = description;
+    if (tags) {
+      tags.forEach(newTag => {
+        const canUpdate = tool.tags.includes(newTag);
+        if (!canUpdate) tool.tags.push(newTag);
+      });
+    }
+
+    await tool.save();
+
+    res.status(200).json({ message: 'Tool updated!' });
+  } catch (error) {
+    next(error);
+  }
+};
+
 exports.deleteTool = async (req, res, next) => {
   try {
     const id = req.params.id;

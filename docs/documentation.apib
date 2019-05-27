@@ -47,10 +47,18 @@ this is VUTTR api documentation
 
 ### Post a tool [POST]
 + Request (application/json)
-    + Attributes (Tool request)
+    + Attributes (Tool POST)
 
 + Response 201 (application/json)
     + Attributes (Tool)
+
+### Patch a tool [PATCH /tools/:id]
++ Request (application/json)
+    + Attributes (Tool PATCH)
+
++ Response 200 (application/json)
+    + Attributes
+        + message: Tool updated! (string)
 
 ### Delete tools [DELETE /tools/:id]
 + Response 200
@@ -64,11 +72,17 @@ this is VUTTR api documentation
 + description: tool description (string, required)
 + tags (array[Tags], required)
 
-### Tool request
+### Tool POST
 + title: express (string, required)
 + link: express.com (string, required)
 + description: tool description (string, required)
 + tags (array[Tags], required)
+
+### Tool PATCH
++ title: express (string)
++ link: express.com (string)
++ description: tool description (string)
++ tags (array[Tags])
 
 ### Tags
 + tags: Node, Framework (required)

@@ -5,13 +5,16 @@ const isAuth = require('../../middlewares/isAuth');
 
 const toolController = require('../../controllers/toolController');
 
-// /v1/tools
+// /tools
 router.get('/tools', toolController.getTools);
 
-// /v1/tools
+// /tools
 router.post('/tools', isAuth, toolController.postTool);
 
-// /v1/tool/delete
+// /tools:id
+router.patch('/tools/:id', isAuth, toolController.patchTool);
+
+// /tools/:id
 router.delete('/tools/:id', isAuth, toolController.deleteTool);
 
 module.exports = router;
