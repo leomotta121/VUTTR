@@ -21,7 +21,7 @@ describe('Tool test', () => {
   });
 
   describe('test tools routes', () => {
-    describe('creat tool', () => {
+    describe('Will test [POST] /tools', () => {
       it('register a tool', async () => {
         const user = await factory.create('User', { password: '123456' });
 
@@ -84,7 +84,7 @@ describe('Tool test', () => {
       });
     });
 
-    describe('/delete', () => {
+    describe('will test [DELETE] /tools', () => {
       it('delete a tool', async () => {
         const user = await factory.create('User', { password: '123456' });
 
@@ -102,7 +102,7 @@ describe('Tool test', () => {
           .expect(200);
       });
 
-      it('tool not registered', async () => {
+      it('will not find tool not registered', async () => {
         const user = await factory.create('User', { password: '123456' });
 
         const signedUser = await request(app)
@@ -118,14 +118,96 @@ describe('Tool test', () => {
       });
     });
 
-    describe('/tools', () => {
+    describe('will test [PATCH] /tools/:id', () => {
+      it('will patch a tool', async () => {
+        const user = await factory.create('User', { password: '123456' });
+
+        const signedUser = await request(app)
+          .post('/signin')
+          .send({ email: user.email, password: '123456' });
+
+        const token = signedUser.body.token;
+
+        const tool = await factory.create('Tool');
+
+        await request(app)
+          .patch(`/tools/${tool._id}`)
+          .set('Authorization', `Bearer ${token}`)
+          .send({
+            title: 'express',
+            link: 'https://expressjs.com/',
+            description:
+              'Express is a minimal and flexible Node.js web application framework that provides a robust set of features for web and mobile applications.',
+            tags: ['node', 'framework']
+          })
+          .expect(200);
+      });
+
+      it('will not update tool, missing all fields', async () => {
+        const user = await factory.create('User', { password: '123456' });
+
+        const signedUser = await request(app)
+          .post('/signin')
+          .send({ email: user.email, password: '123456' });
+
+        const token = signedUser.body.token;
+
+        const tool = await factory.create('Tool');
+
+        await request(app)
+          .patch(`/tools/${tool._id}`)
+          .set('Authorization', `Bearer ${token}`)
+          .send({})
+          .expect(400);
+      });
+
+      it('tags most be an array', async () => {
+        const user = await factory.create('User', { password: '123456' });
+
+        const signedUser = await request(app)
+          .post('/signin')
+          .send({ email: user.email, password: '123456' });
+
+        const token = signedUser.body.token;
+
+        const tool = await factory.create('Tool');
+
+        await request(app)
+          .patch(`/tools/${tool._id}`)
+          .set('Authorization', `Bearer ${token}`)
+          .send({
+            tags: 'node'
+          })
+          .expect(400);
+      });
+
+      it('wrong id, tool not registered', async () => {
+        const user = await factory.create('User', { password: '123456' });
+
+        const signedUser = await request(app)
+          .post('/signin')
+          .send({ email: user.email, password: '123456' });
+
+        const token = signedUser.body.token;
+
+        await request(app)
+          .patch(`/tools/5cec64a057f604001f5566c4`)
+          .set('Authorization', `Bearer ${token}`)
+          .send({
+            tags: ['node']
+          })
+          .expect(400);
+      });
+    });
+
+    describe('will test [GET] /tools', () => {
       it('Fetch all tools', async () => {
         await request(app)
           .get('/tools')
           .expect(200);
       });
 
-      it('Fetch all tools by tag', async () => {
+      it('Fetch all tools by tag [GET] /tools?tag=tag', async () => {
         const tool = await factory.create('Tool');
 
         await request(app)
@@ -133,7 +215,7 @@ describe('Tool test', () => {
           .expect(200);
       });
 
-      it('Could not find any tool.', async () => {
+      it('Could not find any tool. [GET] /tools?tag=tag', async () => {
         await request(app)
           .get('/tools?tag=node')
           .expect(400);

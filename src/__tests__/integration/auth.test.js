@@ -21,7 +21,7 @@ describe('Auth test', () => {
   });
 
   describe('test auth routes', () => {
-    describe('/signup', () => {
+    describe('[POST] /signup', () => {
       it('sign up a user', async () => {
         await request(app)
           .post('/signup')
@@ -46,7 +46,7 @@ describe('Auth test', () => {
       });
     });
 
-    describe('/signin', () => {
+    describe('[POST] /signin', () => {
       it('Sign In a user', async () => {
         const user = await factory.create('User', { password: '123456' });
 
