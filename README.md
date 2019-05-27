@@ -17,3 +17,7 @@ It should install all dependencies, now run:
 `npm run dev`
 
 It will start the server on port 3000.
+
+or you may also run `docker-compose up`
+
+Just make sure you don't have anything on port 3000
