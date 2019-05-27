@@ -5,9 +5,6 @@ const isAuth = require('../../middlewares/isAuth');
 
 const toolController = require('../../controllers/toolController');
 
-const passport = require('passport');
-require('../../middlewares/passport')(passport);
-
 // /v1/tools
 router.get('/tools', toolController.getTools);
 
