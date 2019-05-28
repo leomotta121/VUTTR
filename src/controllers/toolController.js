@@ -1,3 +1,4 @@
+const ApiError = require('../services/apiError');
 const Tool = require('../models/tool');
 
 exports.getTools = async (req, res, next) => {
@@ -11,11 +12,8 @@ exports.getTools = async (req, res, next) => {
 
     const tools = await Tool.find({ tags: tag });
 
-    if (tools.length <= 0) {
-      const error = new Error('Could not find any tool.');
-      error.status = 400;
-      throw error;
-    }
+    if (tools.length <= 0)
+      throw new ApiError('Tools not found', 400, 'No tools registered with this tag.');
 
     return res.status(200).json(tools);
   } catch (error) {
@@ -27,17 +25,11 @@ exports.postTool = async (req, res, next) => {
   try {
     const { title, link, description, tags } = req.body;
 
-    if (!title || !link || !description || !tags) {
-      const error = new Error('Required field is missing.');
-      error.status = 400;
-      throw error;
-    }
+    if (!title || !link || !description || !tags)
+      throw new ApiError('Missing field', 400, 'One or more fields are missing.');
 
-    if (await Tool.findOne({ title })) {
-      const error = new Error('Tool registered.');
-      error.status = 400;
-      throw error;
-    }
+    if (await Tool.findOne({ title }))
+      throw new ApiError('Tool already registered', 400, 'This title is already in use.');
 
     const tool = await Tool.create({
       title: title,
@@ -59,25 +51,14 @@ exports.patchTool = async (req, res, next) => {
     const { title, link, description, tags } = req.body;
     const { id } = req.params;
 
-    if (!title && !link && !description && !tags) {
-      const error = new Error('Nothing to edit.');
-      error.status = 400;
-      throw error;
-    }
+    if (!title && !link && !description && !tags)
+      throw new ApiError('Nothing to edit', 400, 'No field entered to edit.');
 
-    if (!Array.isArray(tags)) {
-      const error = new Error('Tags most be an array.');
-      error.status = 400;
-      throw error;
-    }
+    if (!Array.isArray(tags)) throw new ApiError('Tags is not array', 400, 'Tags most be an array');
 
     const tool = await Tool.findById(id);
 
-    if (!tool) {
-      const error = new Error('Could not find any tool.');
-      error.status = 400;
-      throw error;
-    }
+    if (!tool) throw new ApiError('Tools not found', 400, 'No tools registered with this id.');
 
     if (title) tool.title = title;
     if (link) tool.link = link;
@@ -103,11 +84,7 @@ exports.deleteTool = async (req, res, next) => {
 
     const tool = await Tool.findById(id);
 
-    if (!tool) {
-      const error = new Error('Could not find any tool.');
-      error.status = 400;
-      throw error;
-    }
+    if (!tool) throw new ApiError('Tools not found', 400, 'No tools registered with this id.');
 
     await Tool.findByIdAndRemove(id);
 

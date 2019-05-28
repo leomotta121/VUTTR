@@ -2,6 +2,8 @@ require('dotenv').config({
   path: '.env'
 });
 
+const ApiError = require('./services/apiError');
+
 // Third part libs
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -25,15 +27,14 @@ app.use(v1);
 
 // Catch 404
 app.use((req, res, next) => {
-  const error = new Error('Route not found.');
-  error.status = 404;
+  const error = new ApiError('Not found', 404, 'Route not found.');
   next(error);
 });
 
 // Catch errors
 app.use((error, req, res, next) => {
   console.log(error);
-  const status = error.status || 500;
+  const status = error.statusCode || 500;
   const message = error.message;
   res.status(status).json({ message: message, status: status });
 });
