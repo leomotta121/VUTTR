@@ -34,7 +34,7 @@ _Just make sure you don't have anything on port 3000_
 
 ### Auth
 
-- `[POST] /signin` : Create a new user
-- `[POST] /signup` : Sign up a user
+- `[POST] /signup` : Create a new user
+- `[POST] /signin` : Sign in a user
 
 A better docmentation can be found [here](https://github.com/leomotta121/VUTTR/blob/master/docs/output.html). Download the html file and open on your browser.
