@@ -37,4 +37,4 @@ _Just make sure you don't have anything on port 3000_
 - `[POST] /signup` : Create a new user
 - `[POST] /signin` : Sign in a user
 
-A better docmentation can be found [here](https://github.com/leomotta121/VUTTR/blob/master/docs/output.html). Download the html file and open on your browser.
+Better documentation can be found [here](https://github.com/leomotta121/VUTTR/blob/master/docs/output.html). Download the html file and open on your browser. Or read the [Markdown](https://github.com/leomotta121/VUTTR/blob/master/docs/documentation.apib)
