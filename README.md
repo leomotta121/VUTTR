@@ -2,7 +2,7 @@
 
 This is a project done for [BossaBox](https://bossabox.com)'s challenge
 
-## set a .env file with:
+## Set a .env file with:
 
 MONGODB_URL, PASSPORT_SECRET
 
@@ -20,4 +20,22 @@ It will start the server on port 3000.
 
 or you may also run `docker-compose up`
 
-Just make sure you don't have anything on port 3000
+_Just make sure you don't have anything on port 3000_
+
+## Routes
+
+### Tools
+
+- `[GET] /tools` : Will fetch all tools
+- `[GET] /tools?tag=tagname` : Will fetch all tools by tag
+- `[POST] /tools` : Create a new tool
+- `[PATCH] /tools/:id` : Update an existing tool with ID parameter
+- `[DELETE] /tools/:id` : Delete an existing tool with ID parameter
+
+### Auth
+
+- `[POST] /signin` : Create a new user
+- `[POST] /signup` : Sign up a user
+
+https://github.com/leomotta121/VUTTR/blob/master/docs/output.html
+A better docmentation can be found [here](https://bossabox.com). Download the html file and open on your browser.
