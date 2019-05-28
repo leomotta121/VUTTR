@@ -2,13 +2,24 @@ FORMAT: 1A
 
 # VUTTR
 
-this is VUTTR api documentation
+this is a web api made for BossaBox's challenge
+
+## Authentication
+VUTTR API uses passport jwt strategy, so some routes may need Authorization Headers with a valid token.
+
+## Media Types
+Requests with a message-body are using plain JSON to set or update resource states.
+
+## Error States
+Some of the common [HTTP Response Status Codes](https://github.com/for-GET/know-your-http-well/blob/master/status-codes.md) are used.
 
 # Group Auth
 
-## Sign up Collection [/signup]
+## Sign up [/signup]
 
 ### Sign up an user [POST]
+Will create a new user to the database.
+
 + Request (application/json)
     + Attributes
         + name: Leo (string, required)
@@ -23,6 +34,8 @@ this is VUTTR api documentation
 ## Sign in Collection [/signin]
 
 ### Sign in an user [POST]
+Will authenticate a with a valid token.
+
 + Request (application/json)
     + Attributes
         + email: test@test.com (string, required)
@@ -35,32 +48,60 @@ this is VUTTR api documentation
 
 # Group Tools
 
-## Tool Collection [/tools]
+## Tools [/tools]
 
-### Get all tools [GET]
+### Get tools [GET]
+Will get all the tools.
+
 + Response 200 (application/json)
     + Attributes (array[Tool])
 
-### Get all tools by tag [GET /tools?tag=node]
-+ Response 200 (application/json)
-    + Attributes (array[Tool])
+### Post tool [POST]
+Will create a new tool.
 
-### Post a tool [POST]
-+ Request (application/json)
++ Request
+    + Headers
+
+            Authorization: Bearer QWxhZGRpbjpvcGVuIHNlc2FtZQ==
     + Attributes (Tool POST)
 
 + Response 201 (application/json)
     + Attributes (Tool)
 
-### Patch a tool [PATCH /tools/:id]
+## Tools [/tools{?tag}]
+
+### Get tools by tags [GET]
+Will get all tools by tag.
+
++ Parameters
+    + tag: node (string, required) - The tag name
++ Response 200 (application/json)
+    + Attributes (array[Tool])
+
+## Tool ID Required [/tools/{id}]
++ Parameters
+    + id: 5cec64a057f604001f5566c4 (required, string) - ID of a tool as string
+
+### Patch tool [PATCH]
+Will modify one or more fields of a tool.
+
 + Request (application/json)
+    + Headers
+
+            Authorization: Bearer QWxhZGRpbjpvcGVuIHNlc2FtZQ==
     + Attributes (Tool PATCH)
 
 + Response 200 (application/json)
     + Attributes
         + message: Tool updated! (string)
 
-### Delete tools [DELETE /tools/:id]
+### Delete tool [DELETE]
+Will delete a tool.
+
++ Request
+    + Headers
+
+            Authorization: Bearer QWxhZGRpbjpvcGVuIHNlc2FtZQ==
 + Response 200
 
 ## Data Structures
