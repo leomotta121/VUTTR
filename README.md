@@ -37,5 +37,4 @@ _Just make sure you don't have anything on port 3000_
 - `[POST] /signin` : Create a new user
 - `[POST] /signup` : Sign up a user
 
-https://github.com/leomotta121/VUTTR/blob/master/docs/output.html
-A better docmentation can be found [here](https://bossabox.com). Download the html file and open on your browser.
+A better docmentation can be found [here](https://github.com/leomotta121/VUTTR/blob/master/docs/output.html). Download the html file and open on your browser.
