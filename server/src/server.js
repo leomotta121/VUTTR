@@ -10,8 +10,8 @@ mongoose.connection
   .once('open', () => console.log('connected to databse'))
   .on('error', error => console.warn('error: ' + error));
 
-server.listen(process.env.PORT || 3000, () => {
-  console.log(`listening on ${process.env.PORT || 3000}`);
+server.listen(process.env.PORT || 3001, () => {
+  console.log(`listening on ${process.env.PORT || 3001}`);
 });
 
 module.exports = {
