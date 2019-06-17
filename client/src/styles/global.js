@@ -9,7 +9,8 @@ const GlobalStyle = createGlobalStyle`
 }
 body, html {
   background: #eee;
-  font-family: 'Helvetica Neue', 'Helvetica', Arial, sans-serif;
+  font-family: 'PT Mono', monospace;
+  font-size: 20px;
   text-rendering: optimizeLegibility !important;
   -webkit-font-smoothing: antialiased !important;
 }
