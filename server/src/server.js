@@ -11,7 +11,7 @@ mongoose.connection
   .on('error', error => console.warn('error: ' + error));
 
 server.listen(process.env.PORT || 3000, () => {
-  console.log(`listening on ${process.env.PORT}`);
+  console.log(`listening on ${process.env.PORT || 3000}`);
 });
 
 module.exports = {
