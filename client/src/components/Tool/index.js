@@ -11,7 +11,7 @@ const Tool = props => {
             {props.title}
           </a>
         </h2>
-        {props.showButton ? <button onClick={() => {}}>Remove</button> : null}
+        {props.showButton ? <button onClick={props.onDelete}>Remove</button> : null}
       </header>
 
       <p>{props.description}</p>
