@@ -48,6 +48,14 @@ class Home extends Component {
         const errorMessage = error.response.data.message;
         this.setState({ errorMessage });
       }
+    } else {
+      try {
+        const tools = await api.get(`/tools?title=${searchFor}`);
+        this.setState({ tools: tools.data });
+      } catch (error) {
+        const errorMessage = error.response.data.message;
+        this.setState({ errorMessage });
+      }
     }
   };
 
