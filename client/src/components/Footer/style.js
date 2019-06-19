@@ -1,12 +1,8 @@
 import styled from 'styled-components';
 
 const styledFooter = styled.footer`
-  padding: 1rem;
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background-color: lightgrey;
+  background-color: lightgray;
+  padding: 1em;
 
   p {
     text-align: center;

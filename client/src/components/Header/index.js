@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { withRouter, Link } from 'react-router-dom';
+
 import { isAuthenticated } from '../../services/auth';
 import StyledNav from './style';
 
@@ -10,16 +12,20 @@ const Header = () => {
     <StyledNav>
       {isAuth ? (
         <div className="actions">
-          <button>Sign out</button>
+          <Link to="/" className="sign-out" onClick={() => {}}>
+            Sign out
+          </Link>
         </div>
       ) : (
         <div className="actions">
-          <button>Sign in</button>
-          <button>Sign up</button>
+          <Link to="/signin">Sign In</Link>
+          <Link to="/signup" className="sign-up">
+            Sign Up
+          </Link>
         </div>
       )}
     </StyledNav>
   );
 };
 
-export default Header;
+export default withRouter(Header);
