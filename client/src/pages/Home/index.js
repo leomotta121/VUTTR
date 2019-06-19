@@ -3,6 +3,7 @@ import React, { Component } from 'react';
 import api from '../../services/api';
 import { isAuthenticated } from '../../services/auth';
 
+import StyledMain from './style';
 import Tool from '../../components/Tool';
 import ActionsBar from '../../components/ActionsBar';
 
@@ -67,14 +68,16 @@ class Home extends Component {
     const error = <p>{errorMessage}</p>;
 
     return (
-      <main>
+      <StyledMain>
         <h1>VUTTR</h1>
+        <h3>Very Useful Tools to Remember</h3>
         <ActionsBar
           searchFor={searchFor}
           searchByTag={searchByTag}
           searching={searching}
           inputChanged={this.inputChangedHandler}
           onSearch={this.searchHandler}
+          showButton={authContent}
         />
         {tools
           ? tools.map(tool => (
@@ -89,7 +92,7 @@ class Home extends Component {
               />
             ))
           : error}
-      </main>
+      </StyledMain>
     );
   }
 }

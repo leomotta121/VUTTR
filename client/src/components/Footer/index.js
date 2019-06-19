@@ -1,7 +1,14 @@
 import React from 'react';
 
+import StyledFooter from './style';
+
 const Footer = () => {
-  return <h1>Footer will be here</h1>;
+  return (
+    <StyledFooter>
+      <p>&copy; Copyright 2019</p>
+      <p>All rights reserved. Powered by VUTTR.</p>
+    </StyledFooter>
+  );
 };
 
 export default Footer;

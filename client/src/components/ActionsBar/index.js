@@ -1,10 +1,12 @@
 import React from 'react';
 
+import Container from './style';
+
 import Spinner from '../Spinner';
 
 const ActionsBar = props => {
   return (
-    <div>
+    <Container>
       <form onSubmit={props.onSearch}>
         <div className="search-bar">
           <input
@@ -18,6 +20,7 @@ const ActionsBar = props => {
 
         <label>
           <input
+            className="checkbox"
             type="checkbox"
             onChange={props.inputChanged}
             name="searchByTag"
@@ -27,8 +30,8 @@ const ActionsBar = props => {
         </label>
       </form>
 
-      <button>+ Add</button>
-    </div>
+      {props.showButton ? <button>+ ADD</button> : null}
+    </Container>
   );
 };
 
