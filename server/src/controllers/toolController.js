@@ -6,7 +6,9 @@ exports.getTools = async (req, res, next) => {
     const { tag, title } = req.query;
 
     if (tag) {
-      const tools = await Tool.find({ tags: tag });
+      const tools = await Tool.find({
+        tags: { $regex: tag, $options: 'i' }
+      });
       return res.status(200).json(tools);
     } else if (title) {
       const tools = await Tool.find({
