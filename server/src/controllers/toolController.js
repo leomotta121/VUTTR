@@ -3,14 +3,19 @@ const Tool = require('../models/tool');
 
 exports.getTools = async (req, res, next) => {
   try {
-    const tag = req.query.tag;
+    const { tag, title } = req.query;
 
-    if (!tag) {
-      const tools = await Tool.find();
+    if (tag) {
+      const tools = await Tool.find({ tags: tag });
+      return res.status(200).json(tools);
+    } else if (title) {
+      const tools = await Tool.find({
+        title: { $regex: title, $options: 'i' }
+      });
       return res.status(200).json(tools);
     }
 
-    const tools = await Tool.find({ tags: tag });
+    const tools = await Tool.find();
 
     if (tools.length <= 0)
       throw new ApiError('Tools not found', 400, 'No tools registered with this tag.');
