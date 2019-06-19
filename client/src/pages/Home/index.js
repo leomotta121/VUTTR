@@ -39,23 +39,25 @@ class Home extends Component {
   searchHandler = async e => {
     e.preventDefault();
 
+    this.setState({ searching: true });
+
     const searchFor = this.state.searchFor;
 
     if (this.state.searchByTag) {
       try {
         const tools = await api.get(`/tools?tag=${searchFor}`);
-        this.setState({ tools: tools.data });
+        this.setState({ tools: tools.data, searching: false });
       } catch (error) {
         const errorMessage = error.response.data.message;
-        this.setState({ errorMessage });
+        this.setState({ errorMessage, searching: false });
       }
     } else {
       try {
         const tools = await api.get(`/tools?title=${searchFor}`);
-        this.setState({ tools: tools.data });
+        this.setState({ tools: tools.data, searching: false });
       } catch (error) {
         const errorMessage = error.response.data.message;
-        this.setState({ errorMessage });
+        this.setState({ errorMessage, searching: false });
       }
     }
   };

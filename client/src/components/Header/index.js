@@ -2,7 +2,7 @@ import React from 'react';
 
 import { withRouter, Link } from 'react-router-dom';
 
-import { isAuthenticated } from '../../services/auth';
+import { isAuthenticated, logout } from '../../services/auth';
 import StyledNav from './style';
 
 const Header = () => {
@@ -12,7 +12,7 @@ const Header = () => {
     <StyledNav>
       {isAuth ? (
         <div className="actions">
-          <Link to="/" className="sign-out" onClick={() => {}}>
+          <Link to="/" className="sign-out" onClick={() => logout()}>
             Sign out
           </Link>
         </div>
