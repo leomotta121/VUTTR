@@ -16,12 +16,15 @@ const ActionsBar = props => {
           <button type="submit">{props.searching ? <Spinner /> : 'icon here'}</button>
         </div>
 
-        <input
-          type="checkbox"
-          onChange={props.checkBoxChanged}
-          name="searchByTag"
-          checked={props.searchByTag}
-        />
+        <label>
+          <input
+            type="checkbox"
+            onChange={props.inputChanged}
+            name="searchByTag"
+            checked={props.searchByTag}
+          />
+          Search in tags only
+        </label>
       </form>
 
       <button>+ Add</button>

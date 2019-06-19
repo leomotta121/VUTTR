@@ -28,20 +28,27 @@ class Home extends Component {
   }
 
   inputChangedHandler = event => {
-    this.setState({ [event.target.name]: event.target.value });
+    const target = event.target;
+    const value = target.type === 'checkbox' ? target.checked : target.value;
+    const name = target.name;
+
+    this.setState({ [name]: value });
   };
 
-  checkBoxChangedHandler = event => {
-    console.log(event.target.checked);
-    this.setState({ searchByTag: event.target.checked });
-    console.log(this.state.searchByTag);
-  };
-
-  searchHandler = e => {
+  searchHandler = async e => {
     e.preventDefault();
 
-    this.setState({ searching: !this.state.searching });
-    console.log(this.state.searchFor);
+    const searchFor = this.state.searchFor;
+
+    if (this.state.searchByTag) {
+      try {
+        const tools = await api.get(`/tools?tag=${searchFor}`);
+        this.setState({ tools: tools.data });
+      } catch (error) {
+        const errorMessage = error.response.data.message;
+        this.setState({ errorMessage });
+      }
+    }
   };
 
   deleteToolHandler = () => {};
@@ -59,7 +66,6 @@ class Home extends Component {
           searchByTag={searchByTag}
           searching={searching}
           inputChanged={this.inputChangedHandler}
-          checkBoxChanged={this.checkBoxChangedHandler}
           onSearch={this.searchHandler}
         />
         {tools
