@@ -1,7 +1,8 @@
 import styled from 'styled-components';
+import colors from '../../helper/colors';
 
 const StyledNav = styled.nav`
-  background-color: #170c3a;
+  background-color: ${colors.regular.ink};
   height: 2.5rem;
 
   display: flex;
@@ -15,40 +16,40 @@ const StyledNav = styled.nav`
   .actions a {
     margin: 0 10px;
     text-decoration: none;
-    color: #ffffff;
+    color: ${colors.regular.white};
     font-size: 16px;
     padding: 7px 13px;
     border-radius: 5px;
   }
 
   .actions .sign-up {
-    border: 1px solid #365df0;
-    background-color: #365df0;
+    border: 1px solid ${colors.regular.blue};
+    background-color: ${colors.regular.blue};
   }
 
   .actions .sign-up:hover {
-    border: 1px solid #2f55cc;
-    background-color: #2f55cc;
+    border: 1px solid ${colors.dark.blue};
+    background-color: ${colors.dark.blue};
   }
 
   .actions .sign-up:active {
-    border: 1px solid #244aa8;
-    background-color: #244aa8;
+    border: 1px solid ${colors.darker.blue};
+    background-color: ${colors.darker.blue};
   }
 
   .actions .sign-out {
-    border: 1px solid #f95e5a;
-    background-color: #f95e5a;
+    border: 1px solid ${colors.regular.red};
+    background-color: ${colors.regular.red};
   }
 
   .actions .sign-out:hover {
-    border: 1px solid #cc4c4c;
-    background-color: #cc4c4c;
+    border: 1px solid ${colors.dark.red};
+    background-color: ${colors.dark.red};
   }
 
   .actions .sign-out:active {
-    border: 1px solid #a53f3f;
-    background-color: #a53f3f;
+    border: 1px solid ${colors.darker.red};
+    background-color: ${colors.darker.red};
   }
 `;
 

@@ -1,4 +1,5 @@
 import { createGlobalStyle } from 'styled-components';
+import colors from '../helper/colors';
 
 const GlobalStyle = createGlobalStyle`
 * {
@@ -9,14 +10,13 @@ const GlobalStyle = createGlobalStyle`
   font-family: 'PT Mono', monospace;
 }
 body, html {
-  background: #eee;
   font-size: 20px;
   text-rendering: optimizeLegibility !important;
   -webkit-font-smoothing: antialiased !important;
 }
 
 h1, h2, h3, p, a, label, button {
-  color: #170C3A;
+  color: ${colors.regular.ink};
 }
 
 h1 {

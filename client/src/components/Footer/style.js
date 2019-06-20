@@ -1,11 +1,12 @@
 import styled from 'styled-components';
+import colors from '../../helper/colors';
 
 const styledFooter = styled.footer`
-  background-color: #8f8a9b;
+  background-color: ${colors.light.ink};
   padding: 1em;
 
   p {
-    color: #ffffff;
+    color: ${colors.regular.white};
     text-align: center;
   }
 `;
