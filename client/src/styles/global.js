@@ -7,9 +7,9 @@ const GlobalStyle = createGlobalStyle`
   padding: 0;
   margin: 0;
   outline: 0; 
-  font-family: 'PT Mono', monospace;
 }
 body, html {
+  font-family: 'PT Mono', monospace;
   font-size: 20px;
   text-rendering: optimizeLegibility !important;
   -webkit-font-smoothing: antialiased !important;

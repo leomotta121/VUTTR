@@ -8,7 +8,9 @@ const colors = {
   light: {
     ink: '#8F8A9B'
   },
-  lighter: {},
+  lighter: {
+    ink: '#B1ADB9'
+  },
   lightest: {},
   mostLightest: {},
   dark: {
@@ -17,9 +19,12 @@ const colors = {
   },
   darker: {
     blue: '#244AA8',
-    red: '#A53F3F'
+    red: '#A53F3F',
+    white: '#F5F4F6'
   },
-  darkest: {}
+  darkest: {
+    white: '#EBEAED'
+  }
 };
 
 export default colors;

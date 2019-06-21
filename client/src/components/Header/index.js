@@ -5,8 +5,21 @@ import { withRouter, Link } from 'react-router-dom';
 import { isAuthenticated, logout } from '../../services/auth';
 import StyledNav from './style';
 
-const Header = () => {
+const Header = props => {
   const isAuth = isAuthenticated();
+  const pathName = props.location.pathname;
+
+  let signup = (
+    <Link to="/signup" className="sign-up">
+      Sign Up
+    </Link>
+  );
+
+  let signin = <Link to="/signin">Sign In</Link>;
+
+  if (pathName === '/signup') signup = null;
+
+  if (pathName === '/signin') signin = null;
 
   return (
     <StyledNav>
@@ -18,10 +31,8 @@ const Header = () => {
         </div>
       ) : (
         <div className="actions">
-          <Link to="/signin">Sign In</Link>
-          <Link to="/signup" className="sign-up">
-            Sign Up
-          </Link>
+          {signin}
+          {signup}
         </div>
       )}
     </StyledNav>
