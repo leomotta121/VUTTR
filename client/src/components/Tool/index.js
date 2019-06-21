@@ -45,7 +45,11 @@ const Tool = props => {
         <footer>
           <p>
             {props.tags.map(tag => (
-              <Link key={tag} to={`/?tag=${tag}`} onClick={props.getToolsByTag}>{`#${tag} `}</Link>
+              <Link
+                key={tag}
+                to={`/?tag=${tag}`}
+                onClick={() => props.getToolsByTag(tag)}
+              >{`#${tag} `}</Link>
             ))}
           </p>
         </footer>

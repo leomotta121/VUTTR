@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { withRouter } from 'react-router-dom';
 
 import api from '../../services/api';
 import { isAuthenticated } from '../../services/auth';
@@ -47,6 +48,8 @@ class Home extends Component {
       try {
         const tools = await api.get(`/tools?tag=${searchFor}`);
         this.setState({ tools: tools.data, searching: false });
+
+        this.props.history.push(`/?tag=${searchFor}`);
       } catch (error) {
         const errorMessage = error.response.data.message;
         this.setState({ errorMessage, searching: false });
@@ -55,10 +58,23 @@ class Home extends Component {
       try {
         const tools = await api.get(`/tools?title=${searchFor}`);
         this.setState({ tools: tools.data, searching: false });
+
+        this.props.history.push(`/?title=${searchFor}`);
       } catch (error) {
         const errorMessage = error.response.data.message;
         this.setState({ errorMessage, searching: false });
       }
+    }
+  };
+
+  tagClickedHandler = async tag => {
+    try {
+      const tools = await api.get(`/tools?tag=${tag}`);
+
+      this.setState({ tools: tools.data, searching: false });
+    } catch (error) {
+      const errorMessage = error.response.data.message;
+      this.setState({ errorMessage });
     }
   };
 
@@ -90,7 +106,8 @@ class Home extends Component {
                 description={tool.description}
                 tags={tool.tags}
                 showButton={authContent}
-                onDelete={this.deleteToolHandler}
+                onDelete={() => {}}
+                getToolsByTag={this.tagClickedHandler}
               />
             ))
           : error}
@@ -99,4 +116,4 @@ class Home extends Component {
   }
 }
 
-export default Home;
+export default withRouter(Home);
