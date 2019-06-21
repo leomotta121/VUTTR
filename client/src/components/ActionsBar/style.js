@@ -7,12 +7,45 @@ const Container = styled.div`
 
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+
+  .add-button {
+    border-radius: 100%;
+    height: 45px;
+    width: 45px;
+    padding: 0;
+    margin: 0;
+    font-size: 30px;
+  }
 
   form {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: flex-start;
+
+    .search-bar {
+      display: flex;
+
+      input {
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+      }
+
+      .search-button {
+        height: 50px;
+        width: 50px;
+        padding: 0;
+
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+
+        margin: 0;
+
+        svg {
+          height: 20px;
+        }
+      }
+    }
 
     label {
       display: block;

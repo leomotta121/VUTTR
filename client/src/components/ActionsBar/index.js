@@ -1,21 +1,34 @@
 import React from 'react';
 
 import Container from './style';
+import colors from '../../helper/colors';
 
+import { ReactComponent as SearchIcon } from '../../assets/Icon-Search-2px.svg';
+import Input from '../Input';
 import Spinner from '../Spinner';
+import Button from '../Button';
 
 const ActionsBar = props => {
   return (
     <Container>
       <form onSubmit={props.onSearch}>
         <div className="search-bar">
-          <input
+          <Input
             type="text"
             onChange={props.inputChanged}
             name="searchFor"
             value={props.searchFor}
           />
-          <button type="submit">{props.searching ? <Spinner /> : 'icon here'}</button>
+          <Button
+            className="search-button"
+            type="submit"
+            bgColor={colors.regular.blue}
+            hoverColor={colors.dark.blue}
+            activeColor={colors.darker.blue}
+            fontColor={colors.regular.white}
+          >
+            {props.searching ? <Spinner /> : <SearchIcon />}
+          </Button>
         </div>
 
         <label>
@@ -30,7 +43,17 @@ const ActionsBar = props => {
         </label>
       </form>
 
-      {props.showButton ? <button>+ ADD</button> : null}
+      {props.showButton ? (
+        <Button
+          className="add-button"
+          bgColor={colors.regular.blue}
+          hoverColor={colors.dark.blue}
+          activeColor={colors.darker.blue}
+          fontColor={colors.regular.white}
+        >
+          +
+        </Button>
+      ) : null}
     </Container>
   );
 };
