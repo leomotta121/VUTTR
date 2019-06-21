@@ -78,12 +78,21 @@ class Home extends Component {
     }
   };
 
-  deleteToolHandler = () => {};
+  deleteToolHandler = async id => {
+    try {
+      await api.delete(`/tools/${id}`);
+
+      const tools = this.state.tools.filter(tool => tool._id !== id);
+
+      this.setState({ tools });
+    } catch (error) {
+      const errorMessage = error.response.data.message;
+      this.setState({ errorMessage });
+    }
+  };
 
   render() {
-    const { tools, errorMessage, searchFor, searchByTag, authContent, searching } = this.state;
-
-    const error = <p>{errorMessage}</p>;
+    const { tools, searchFor, searchByTag, authContent, searching } = this.state;
 
     return (
       <StyledMain>
@@ -106,11 +115,11 @@ class Home extends Component {
                 description={tool.description}
                 tags={tool.tags}
                 showButton={authContent}
-                onDelete={() => {}}
+                onDelete={() => this.deleteToolHandler(tool._id)}
                 getToolsByTag={this.tagClickedHandler}
               />
             ))
-          : error}
+          : null}
       </StyledMain>
     );
   }
