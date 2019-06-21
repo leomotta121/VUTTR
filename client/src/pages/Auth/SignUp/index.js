@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
+import api from '../../../services/api';
 
 import StyledForm from './style';
 
@@ -68,6 +69,7 @@ class SignUp extends Component {
       password: '',
       confirmPassword: '',
       validation: this.validator.valid(),
+      isEmailTaken: false,
       buttonClicked: false
     };
 
@@ -79,28 +81,54 @@ class SignUp extends Component {
   inputChangedHandler = event => {
     event.preventDefault();
 
+    if (event.target.name === 'email') this.setState({ isEmailTaken: false });
+
     this.setState({ [event.target.name]: event.target.value });
   };
 
-  formSubmitHandler = event => {
+  formSubmitHandler = async event => {
     event.preventDefault();
+    this.setState({ buttonClicked: true });
 
     const validation = this.validator.validate(this.state);
     this.setState({ validation });
     this.submitted = true;
 
     if (validation.isValid && this.passwordMatch(this.state.confirmPassword, this.state)) {
-      console.log('ok');
+      const { name, lastName, email, password } = this.state;
+
+      try {
+        await api.post('/signup', {
+          name,
+          lastName,
+          email,
+          password
+        });
+
+        this.props.history.push('/signin');
+      } catch (error) {
+        this.setState({ buttonClicked: false });
+
+        if (error.response.data.message === 'The email is already in use.') {
+          this.setState({ isEmailTaken: true });
+        }
+      }
     }
   };
 
   render() {
-    const { name, lastName, email, password, confirmPassword } = this.state;
+    const { name, lastName, email, password, confirmPassword, isEmailTaken } = this.state;
     let validation = this.submitted ? this.validator.validate(this.state) : this.state.validation;
     let disabledButton = true;
+    let emailTakenMessage;
 
     if (name && lastName && email && password && confirmPassword && validation.isValid)
       disabledButton = null;
+
+    if (isEmailTaken) {
+      validation.email.isInvalid = true;
+      emailTakenMessage = 'Email already in use';
+    }
 
     return (
       <Card mtb="30">
@@ -137,7 +165,9 @@ class SignUp extends Component {
               name="email"
               onChange={this.inputChangedHandler}
             />
-            <span className="error-message">{validation.email.message}</span>
+            <span className="error-message">
+              {emailTakenMessage ? emailTakenMessage : validation.email.message}
+            </span>
           </div>
 
           <div className={validation.password.isInvalid ? 'has-error' : null}>
