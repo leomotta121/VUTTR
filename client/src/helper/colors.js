@@ -9,10 +9,13 @@ const colors = {
     ink: '#8F8A9B'
   },
   lighter: {
-    ink: '#B1ADB9'
+    ink: '#B1ADB9',
+    blue: '#B9C6FA'
   },
   lightest: {},
-  mostLightest: {},
+  mostLightest: {
+    red: '#FEEFEE'
+  },
   dark: {
     blue: '#2F55CC',
     red: '#CC4C4C'
