@@ -114,6 +114,8 @@ class SignUp extends Component {
         }
       }
     }
+
+    this.setState({ buttonClicked: false });
   };
 
   render() {

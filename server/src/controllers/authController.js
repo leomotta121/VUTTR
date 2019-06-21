@@ -38,13 +38,12 @@ exports.postSignIn = async (req, res, next) => {
 
     const user = await User.findOne({ email }).select('+password');
 
-    if (!user)
-      throw new ApiError('User not found', 400, 'The email you entered is not registered.');
+    if (!user) throw new ApiError('User not found', 400, 'Email is not registered.');
 
     let isEqual;
     if (user) isEqual = await bcrypt.compare(password, user.password);
 
-    if (!isEqual) throw new ApiError('Bad password', 400, 'The password you entered is incorrect.');
+    if (!isEqual) throw new ApiError('Bad password', 400, 'Password is incorrect.');
 
     const token = user.getToken();
 
