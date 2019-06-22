@@ -8,6 +8,8 @@ const StyledDiv = styled.div`
   border: 1px solid ${colors.darkest.white};
   border-radius: 5px;
   box-shadow: 0px 5px 7px rgba(0, 0, 0, 0.1);
+
+  background-color: ${colors.regular.white};
 `;
 
 export default StyledDiv;

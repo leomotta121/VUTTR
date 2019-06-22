@@ -7,6 +7,7 @@ import { isAuthenticated } from '../../services/auth';
 import StyledMain from './style';
 import Tool from '../../components/Tool';
 import ActionsBar from '../../components/ActionsBar';
+import ManageTools from '../../components/ManageTools';
 
 class Home extends Component {
   state = {
@@ -15,11 +16,13 @@ class Home extends Component {
     authContent: false,
     searchByTag: false,
     searching: false,
+    showAddToolModal: false,
     errorMessage: ''
   };
 
   async componentDidMount() {
     if (isAuthenticated()) this.setState({ authContent: true });
+
     try {
       const tools = await api.get('/tools');
       this.setState({ tools: tools.data });
@@ -78,17 +81,41 @@ class Home extends Component {
     }
   };
 
-  deleteToolHandler = () => {};
+  deleteToolHandler = async id => {
+    try {
+      await api.delete(`/tools/${id}`);
+
+      const tools = this.state.tools.filter(tool => tool._id !== id);
+
+      this.setState({ tools });
+    } catch (error) {
+      const errorMessage = error.response.data.message;
+      this.setState({ errorMessage });
+    }
+  };
+
+  toggleModalHandler = () => {
+    this.setState({ showAddToolModal: !this.state.showAddToolModal });
+  };
 
   render() {
-    const { tools, errorMessage, searchFor, searchByTag, authContent, searching } = this.state;
+    const { tools, searchFor, searchByTag, authContent, searching } = this.state;
 
-    const error = <p>{errorMessage}</p>;
+    const addTool = (
+      <ManageTools
+        title="+ Add new Tool"
+        toggleShow={this.toggleModalHandler}
+        show={this.state.showAddToolModal}
+      >
+        test modaltest modaltest modaltest modaltest modaltest modal
+      </ManageTools>
+    );
 
     return (
       <StyledMain>
         <h1>VUTTR</h1>
         <h3>Very Useful Tools to Remember</h3>
+        {addTool}
         <ActionsBar
           searchFor={searchFor}
           searchByTag={searchByTag}
@@ -96,6 +123,7 @@ class Home extends Component {
           inputChanged={this.inputChangedHandler}
           onSearch={this.searchHandler}
           showButton={authContent}
+          toggleShow={this.toggleModalHandler}
         />
         {tools
           ? tools.map(tool => (
@@ -106,11 +134,11 @@ class Home extends Component {
                 description={tool.description}
                 tags={tool.tags}
                 showButton={authContent}
-                onDelete={() => {}}
+                onDelete={() => this.deleteToolHandler(tool._id)}
                 getToolsByTag={this.tagClickedHandler}
               />
             ))
-          : error}
+          : null}
       </StyledMain>
     );
   }

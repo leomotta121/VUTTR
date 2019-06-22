@@ -4,7 +4,8 @@ import colors from '../../helper/colors';
 
 const StyledInput = styled.input`
   height: 50px;
-  margin-bottom: 15px;
+  margin: 0 auto 15px auto;
+  width: 100%;
   padding: 0 20px;
   font-size: 20px;
   display: block;

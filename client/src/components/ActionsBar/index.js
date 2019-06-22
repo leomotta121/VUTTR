@@ -42,9 +42,9 @@ const ActionsBar = props => {
           Search in tags only
         </label>
       </form>
-
       {props.showButton ? (
         <Button
+          onClick={props.toggleShow}
           className="add-button"
           bgColor={colors.regular.blue}
           hoverColor={colors.dark.blue}
