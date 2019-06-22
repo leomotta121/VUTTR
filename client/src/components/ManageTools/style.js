@@ -2,10 +2,22 @@ import styled from 'styled-components';
 
 import colors from '../../helper/colors';
 
-const StyledForm = styled.form`
+const Container = styled.div`
   button {
     display: block;
     margin-left: auto;
+  }
+
+  .tag-container {
+    display: inline-block;
+    margin: 2px;
+    font-size: 18px;
+    padding: 5px;
+
+    .delete-tag {
+      cursor: pointer;
+      color: ${colors.light.ink};
+    }
   }
 
   .has-error {
@@ -28,4 +40,4 @@ const StyledForm = styled.form`
   }
 `;
 
-export default StyledForm;
+export default Container;

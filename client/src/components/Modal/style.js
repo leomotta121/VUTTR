@@ -6,10 +6,13 @@ const StyledDiv = styled.div`
   position: fixed;
   z-index: 500;
 
+  max-height: 520px;
   width: 400px;
+  overflow: scroll;
+  overflow-x: hidden;
 
   left: 50%;
-  top: 15%;
+  top: 5%;
   margin-left: -200px;
 
   background-color: #fff;
@@ -38,6 +41,8 @@ const StyledDiv = styled.div`
   }
 
   @media (max-width: 450px) {
+    top: 1%;
+    max-height: 420px;
     width: 315px;
     margin-left: -157.5px;
   }

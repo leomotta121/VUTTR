@@ -1,13 +1,15 @@
 import React, { Component } from 'react';
+import api from '../../services/api';
 
 import FormValidator from '../../helper/FormValidator';
 
 import colors from '../../helper/colors';
 
-import StyledForm from './style';
+import Container from './style';
 import Modal from '../Modal';
 import Input from '../Input';
 import Button from '../Button';
+import Card from '../Card';
 
 class ManageTools extends Component {
   constructor(props) {
@@ -67,14 +69,14 @@ class ManageTools extends Component {
     });
   };
 
-  formSubmitHandler = event => {
+  formSubmitHandler = async event => {
     event.preventDefault();
 
     const validation = this.validator.validate(this.state);
     this.setState({ validation });
     this.submitted = true;
 
-    if (validation.isValid) {
+    if (validation.isValid && this.state.tags.length > 0) {
       console.log('submitted');
     }
   };
@@ -82,16 +84,27 @@ class ManageTools extends Component {
   inputKeyDownHandler = event => {
     const validation = this.validator.validate(this.state);
 
-    if ((event.keyCode === 13 || event.keyCode === 32) && !validation.tagInput.message) {
+    if (
+      (event.keyCode === 13 || event.keyCode === 32) &&
+      !validation.tagInput.message &&
+      this.state.tagInput.length > 0
+    ) {
       const { value } = event.target;
+      const tags = this.state.tags;
 
-      this.setState({
-        tags: [...this.state.tags, value],
-        tagInput: ''
-      });
-
-      console.log(value, this.state);
+      if (tags.indexOf(value) === -1) {
+        this.setState({
+          tags: [...tags, value],
+          tagInput: ''
+        });
+      }
     }
+  };
+
+  removeTagHandler = tagName => {
+    const tags = this.state.tags.filter(tag => tag !== tagName);
+
+    this.setState({ tags });
   };
 
   render() {
@@ -103,11 +116,20 @@ class ManageTools extends Component {
     if (title && description && link && tags.length > 0 && validation.isValid)
       disabledButton = null;
 
-    if (this.state.tagInput.length > 12) customTagMessage = 'has-error';
+    if (this.state.tagInput.length > 12) customTagMessage = 'Tag is too long';
+
+    const tagsAdded = tags.map(tag => (
+      <Card key={tag} className="tag-container">
+        <span className="delete-tag" onClick={() => this.removeTagHandler(tag)}>
+          x
+        </span>
+        <span className="tag"> {`#${tag}`}</span>
+      </Card>
+    ));
 
     return (
       <Modal toggleShow={this.props.toggleShow} show={this.props.show} title={this.props.title}>
-        <StyledForm>
+        <Container>
           <div className={validation.title.isInvalid ? 'has-error' : null}>
             <label htmlFor="title">Title:</label>
             <Input
@@ -144,17 +166,29 @@ class ManageTools extends Component {
             <span className="error-message">{validation.link.message}</span>
           </div>
 
-          <div className={validation.tagInput.isInvalid ? 'has-error' : null}>
+          {tagsAdded}
+
+          <div
+            className={
+              validation.tagInput.isInvalid
+                ? 'has-error'
+                : null || customTagMessage
+                ? 'has-error'
+                : null
+            }
+          >
             <label htmlFor="tagInput">Tags:</label>
             <Input
               type="text"
-              placeholder="e.g. node"
+              placeholder="Press Enter or Space to add tags"
               name="tagInput"
               value={this.state.tagInput}
               onChange={this.inputChangedHandler}
               onKeyDown={this.inputKeyDownHandler}
             />
-            <span className="error-message">{validation.tagInput.message}</span>
+            <span className="error-message">
+              {!customTagMessage ? validation.tagInput.message : customTagMessage}
+            </span>
           </div>
 
           <Button
@@ -168,7 +202,7 @@ class ManageTools extends Component {
           >
             Send
           </Button>
-        </StyledForm>
+        </Container>
       </Modal>
     );
   }
