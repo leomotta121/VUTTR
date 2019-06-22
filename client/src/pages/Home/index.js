@@ -111,9 +111,6 @@ class Home extends Component {
       </ManageTools>
     );
 
-  render() {
-    const { tools, searchFor, searchByTag, authContent, searching } = this.state;
-
     return (
       <StyledMain>
         <h1>VUTTR</h1>
@@ -145,7 +142,6 @@ class Home extends Component {
       </StyledMain>
     );
   }
-}
 }
 
 export default withRouter(Home);
