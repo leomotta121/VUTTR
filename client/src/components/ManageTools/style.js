@@ -8,6 +8,16 @@ const Container = styled.div`
     margin-left: auto;
   }
 
+  .delete-actions {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    button {
+      margin: 10px;
+    }
+  }
+
   .tag-container {
     display: inline-block;
     margin: 2px;

@@ -2,6 +2,7 @@
 const SET_TOOLS = 'SET_TOOLS';
 const ADD_TOOL = 'ADD_TOOL';
 const EDIT_TOOL = 'EDIT_TOOL';
+const DELETE_TOOL = 'DELETE_TOOL';
 
 // Initial state
 const INITIAL_STATE = {
@@ -37,6 +38,14 @@ export default function reducer(state = INITIAL_STATE, action) {
         tools: editedTools
       };
 
+    case DELETE_TOOL:
+      const deletedTools = state.tools.filter(tool => tool._id !== action._id);
+
+      return {
+        ...state,
+        tools: deletedTools
+      };
+
     default:
       return state;
   }
@@ -53,4 +62,8 @@ export function addTool(tool) {
 
 export function editTool(tool) {
   return { type: EDIT_TOOL, tool };
+}
+
+export function deleteTool(_id) {
+  return { type: DELETE_TOOL, _id };
 }

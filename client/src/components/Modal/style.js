@@ -8,7 +8,7 @@ const StyledDiv = styled.div`
 
   max-height: 520px;
   width: 400px;
-  overflow: scroll;
+  overflow: ${props => (props.overflow ? props.overflow : 'scroll')};
   overflow-x: hidden;
 
   left: 50%;

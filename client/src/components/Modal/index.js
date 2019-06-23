@@ -3,11 +3,11 @@ import React from 'react';
 import Backdrop from '../Backdrop';
 import StyledDiv from './style';
 
-const Modal = ({ children, toggleShow, show, title }) => {
+const Modal = ({ children, toggleShow, show, title, ...rest }) => {
   const modal = (
     <>
       <Backdrop clicked={toggleShow} />
-      <StyledDiv>
+      <StyledDiv {...rest}>
         <header>
           <h3>{title}</h3>
           <div onClick={toggleShow}>x</div>

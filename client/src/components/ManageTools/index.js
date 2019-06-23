@@ -60,23 +60,27 @@ class ManageTools extends Component {
     ]);
 
     this.state = {
+      _id: '',
       title: '',
       description: '',
       link: '',
       tagInput: '',
       tags: [],
       validation: this.validator.valid(),
-      editMode: false
+      editMode: false,
+      deleteMode: false
     };
 
     this.submitted = false;
   }
 
   componentDidMount() {
-    const { title, description, link, tags } = this.props.tool;
-    if (title) {
+    const { title, description, link, tags, _id } = this.props.tool;
+    if (this.props.action === 'edit')
       this.setState({ editMode: true, title, description, link, tags });
-    }
+
+    if (this.props.action === 'delete')
+      this.setState({ deleteMode: true, title, description, link, tags, _id });
   }
 
   inputChangedHandler = event => {
@@ -99,18 +103,31 @@ class ManageTools extends Component {
         const { title, description, link, tags } = this.state;
         const id = this.props.tool._id;
 
-        const response = await api.patch(`/tools/${id}`, {
-          title,
-          description,
-          link,
-          tags
-        });
+        try {
+          const response = await api.patch(`/tools/${id}`, {
+            title,
+            description,
+            link,
+            tags
+          });
 
-        const tool = response.data;
-        this.props.editTool(tool);
-        this.submitted = false;
-        this.setState({ title: '', description: '', link: '', tags: [] });
-        this.props.toggleShow();
+          const tool = response.data;
+          this.props.editTool(tool);
+          this.submitted = false;
+          this.setState({ title: '', description: '', link: '', tags: [] });
+          this.props.toggleShow();
+        } catch (error) {}
+      } else if (this.state.deleteMode) {
+        const id = this.props.tool._id;
+
+        try {
+          await api.delete(`/tools/${id}`);
+
+          this.props.deleteTool(id);
+          this.submitted = false;
+          this.setState({ title: '', description: '', link: '', tags: [] });
+          this.props.toggleShow();
+        } catch (error) {}
       } else {
         const { title, description, link, tags } = this.state;
 
@@ -157,13 +174,14 @@ class ManageTools extends Component {
   };
 
   render() {
-    const { title, description, link, tags, tagInput, editMode } = this.state;
+    const { title, description, link, tags, tagInput, editMode, deleteMode } = this.state;
     let validation = this.submitted ? this.validator.validate(this.state) : this.state.validation;
     let disabledButton = true;
     let customTagMessage;
-    let modalTitle = '+ Add new tool';
 
+    let modalTitle = '+ Add new tool';
     if (editMode) modalTitle = 'Edit Tool';
+    if (deleteMode) modalTitle = 'Delete Tool';
 
     if (title && description && link && tags.length > 0 && validation.isValid)
       disabledButton = null;
@@ -179,90 +197,125 @@ class ManageTools extends Component {
       </Card>
     ));
 
-    return (
-      <Modal toggleShow={this.props.toggleShow} show={this.props.show} title={modalTitle}>
-        <Container>
-          <div className={validation.title.isInvalid ? 'has-error' : null}>
-            <label htmlFor="title">Title:</label>
-            <Input
-              type="text"
-              placeholder="e.g. React.js"
-              name="title"
-              onChange={this.inputChangedHandler}
-              value={title}
-            />
-            <span className="error-message">{validation.title.message}</span>
-          </div>
+    const AddOrRemoveModal = (
+      <Container>
+        <div className={validation.title.isInvalid ? 'has-error' : null}>
+          <label htmlFor="title">Title:</label>
+          <Input
+            type="text"
+            placeholder="e.g. React.js"
+            name="title"
+            onChange={this.inputChangedHandler}
+            value={title}
+          />
+          <span className="error-message">{validation.title.message}</span>
+        </div>
 
-          <div className={validation.description.isInvalid ? 'has-error' : null}>
-            <label htmlFor="description">Description:</label>
-            <Input
-              type="text"
-              placeholder="e.g. It is a good tool for..."
-              name="description"
-              onChange={this.inputChangedHandler}
-              value={description}
-            />
-            <span className="error-message">{validation.description.message}</span>
-          </div>
+        <div className={validation.description.isInvalid ? 'has-error' : null}>
+          <label htmlFor="description">Description:</label>
+          <Input
+            type="text"
+            placeholder="e.g. It is a good tool for..."
+            name="description"
+            onChange={this.inputChangedHandler}
+            value={description}
+          />
+          <span className="error-message">{validation.description.message}</span>
+        </div>
 
-          <div className={validation.link.isInvalid ? 'has-error' : null}>
-            <label htmlFor="link">Link:</label>
-            <Input
-              type="text"
-              placeholder="e.g. http://www.express.com"
-              name="link"
-              onChange={this.inputChangedHandler}
-              value={link}
-            />
-            <span className="error-message">{validation.link.message}</span>
-          </div>
+        <div className={validation.link.isInvalid ? 'has-error' : null}>
+          <label htmlFor="link">Link:</label>
+          <Input
+            type="text"
+            placeholder="e.g. http://www.express.com"
+            name="link"
+            onChange={this.inputChangedHandler}
+            value={link}
+          />
+          <span className="error-message">{validation.link.message}</span>
+        </div>
 
-          {tagsAdded}
+        {tagsAdded}
 
-          <div
-            className={
-              validation.tagInput.isInvalid
-                ? 'has-error'
-                : null || customTagMessage
-                ? 'has-error'
-                : null || validation.tags.isInvalid
-                ? 'has-error'
-                : null
-            }
+        <div
+          className={
+            validation.tagInput.isInvalid
+              ? 'has-error'
+              : null || customTagMessage
+              ? 'has-error'
+              : null || validation.tags.isInvalid
+              ? 'has-error'
+              : null
+          }
+        >
+          <label htmlFor="tagInput">Tags:</label>
+          <Input
+            type="text"
+            placeholder="Press Enter or Space to add tags"
+            name="tagInput"
+            value={tagInput}
+            onChange={this.inputChangedHandler}
+            onKeyDown={this.inputKeyDownHandler}
+          />
+          <span className="error-message">
+            {customTagMessage
+              ? customTagMessage
+              : null || validation.tags.message
+              ? validation.tags.message
+              : null || validation.tagInput.message
+              ? validation.tagInput.message
+              : null}
+          </span>
+        </div>
+
+        <Button
+          onClick={this.formSubmitHandler}
+          bgColor={colors.regular.blue}
+          hoverColor={colors.dark.blue}
+          activeColor={colors.darker.blue}
+          fontColor={colors.regular.white}
+          disabledColor={colors.lighter.blue}
+          disabled={disabledButton}
+        >
+          Send
+        </Button>
+      </Container>
+    );
+
+    const deleteModal = (
+      <Container>
+        Are you sure you want to remove <strong>{title}</strong>?
+        <div className="delete-actions">
+          <Button
+            onClick={this.props.toggleShow}
+            bgColor={colors.regular.red}
+            hoverColor={colors.dark.red}
+            activeColor={colors.darker.red}
+            fontColor={colors.regular.white}
           >
-            <label htmlFor="tagInput">Tags:</label>
-            <Input
-              type="text"
-              placeholder="Press Enter or Space to add tags"
-              name="tagInput"
-              value={tagInput}
-              onChange={this.inputChangedHandler}
-              onKeyDown={this.inputKeyDownHandler}
-            />
-            <span className="error-message">
-              {customTagMessage
-                ? customTagMessage
-                : null || validation.tags.message
-                ? validation.tags.message
-                : null || validation.tagInput.message
-                ? validation.tagInput.message
-                : null}
-            </span>
-          </div>
-
+            cancel
+          </Button>
           <Button
             onClick={this.formSubmitHandler}
             bgColor={colors.regular.blue}
             hoverColor={colors.dark.blue}
             activeColor={colors.darker.blue}
             fontColor={colors.regular.white}
-            disabledColor={colors.lighter.blue}
-            disabled={disabledButton}
           >
-            Send
+            Yes, remove
           </Button>
-        </Container>
+        </div>
+      </Container>
+    );
+
+    return (
+      <Modal
+        toggleShow={this.props.toggleShow}
+        show={this.props.show}
+        title={modalTitle}
+        overflow={deleteMode ? 'hidden' : null}
+      >
+        {deleteMode ? deleteModal : AddOrRemoveModal}
       </Modal>
     );
   }

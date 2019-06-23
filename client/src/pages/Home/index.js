@@ -15,11 +15,12 @@ import ManageTools from '../../components/ManageTools';
 class Home extends Component {
   state = {
     tool: {},
+    action: '',
     searchFor: '',
     authContent: false,
     searchByTag: false,
     searching: false,
-    showAddToolModal: false,
+    showManageTool: false,
     errorMessage: ''
   };
 
@@ -85,36 +86,32 @@ class Home extends Component {
     }
   };
 
-  deleteToolHandler = async id => {
-    try {
-      await api.delete(`/tools/${id}`);
-
-      const tools = this.props.tools.filter(tool => tool._id !== id);
-
-      this.props.setTools(tools);
-    } catch (error) {
-      const errorMessage = error.response.data.message;
-      this.setState({ errorMessage });
-    }
+  actionButtonClicked = (tool, action) => {
+    this.toggleManageToolHandler();
+    this.setState({ tool, action });
   };
 
-  editToolHandler = tool => {
-    this.toggleModalHandler();
-    this.setState({ tool });
-  };
-
-  toggleModalHandler = () => {
-    this.setState({ showAddToolModal: !this.state.showAddToolModal, tool: {} });
+  toggleManageToolHandler = () => {
+    this.setState({ showManageTool: !this.state.showManageTool, tool: {}, action: '' });
   };
 
   render() {
-    const { searchFor, searchByTag, authContent, searching, showAddToolModal } = this.state;
+    const {
+      searchFor,
+      searchByTag,
+      authContent,
+      searching,
+      showManageTool,
+      tool,
+      action
+    } = this.state;
 
     const addTool = (
       <ManageTools
-        toggleShow={this.toggleModalHandler}
-        show={this.state.showAddToolModal}
-        tool={this.state.tool}
+        toggleShow={this.toggleManageToolHandler}
+        show={showManageTool}
+        tool={tool}
+        action={action}
       >
         test modaltest modaltest modaltest modaltest modaltest modal
       </ManageTools>
@@ -122,10 +119,10 @@ class Home extends Component {
 
     return (
       <StyledMain>
+        {showManageTool ? addTool : null}
+
         <h1>VUTTR</h1>
         <h3>Very Useful Tools to Remember</h3>
-
-        {showAddToolModal ? addTool : null}
 
         <ActionsBar
           searchFor={searchFor}
@@ -134,7 +131,7 @@ class Home extends Component {
           inputChanged={this.inputChangedHandler}
           onSearch={this.searchHandler}
           showButton={authContent}
-          toggleShow={this.toggleModalHandler}
+          toggleShow={this.toggleManageToolHandler}
         />
         {this.props.tools
           ? this.props.tools.map(tool => (
@@ -145,8 +142,8 @@ class Home extends Component {
                 description={tool.description}
                 tags={tool.tags}
                 showButton={authContent}
-                onDelete={() => this.deleteToolHandler(tool._id)}
-                onEdit={() => this.editToolHandler(tool)}
+                onDelete={() => this.actionButtonClicked(tool, 'delete')}
+                onEdit={() => this.actionButtonClicked(tool, 'edit')}
                 getToolsByTag={this.tagClickedHandler}
               />
             ))
