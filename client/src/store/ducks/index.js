@@ -1,3 +1,13 @@
 import { combineReducers } from 'redux';
 
-export default combineReducers({});
+import toolsReducer from './tools';
+
+export default combineReducers({
+  toolsReducer
+});
+
+// {
+//   toolsReducer: {
+//     tools: []
+//   }
+// }

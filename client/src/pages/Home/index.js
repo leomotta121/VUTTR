@@ -1,5 +1,8 @@
 import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import * as toolsActions from '../../store/ducks/tools';
 
 import api from '../../services/api';
 import { isAuthenticated } from '../../services/auth';
@@ -11,7 +14,6 @@ import ManageTools from '../../components/ManageTools';
 
 class Home extends Component {
   state = {
-    tools: [],
     searchFor: '',
     authContent: false,
     searchByTag: false,
@@ -25,7 +27,7 @@ class Home extends Component {
 
     try {
       const tools = await api.get('/tools');
-      this.setState({ tools: tools.data });
+      this.props.setTools(tools.data);
     } catch (error) {
       const errorMessage = error.response.data.message;
       this.setState({ errorMessage });
@@ -50,8 +52,8 @@ class Home extends Component {
     if (this.state.searchByTag) {
       try {
         const tools = await api.get(`/tools?tag=${searchFor}`);
-        this.setState({ tools: tools.data, searching: false });
-
+        this.setState({ searching: false });
+        this.props.setTools(tools.data);
         this.props.history.push(`/?tag=${searchFor}`);
       } catch (error) {
         const errorMessage = error.response.data.message;
@@ -60,7 +62,8 @@ class Home extends Component {
     } else {
       try {
         const tools = await api.get(`/tools?title=${searchFor}`);
-        this.setState({ tools: tools.data, searching: false });
+        this.setState({ searching: false });
+        this.props.setTools(tools.data);
 
         this.props.history.push(`/?title=${searchFor}`);
       } catch (error) {
@@ -73,8 +76,8 @@ class Home extends Component {
   tagClickedHandler = async tag => {
     try {
       const tools = await api.get(`/tools?tag=${tag}`);
-
-      this.setState({ tools: tools.data, searching: false });
+      this.setState({ searching: false });
+      this.props.setTools(tools.data);
     } catch (error) {
       const errorMessage = error.response.data.message;
       this.setState({ errorMessage });
@@ -85,9 +88,9 @@ class Home extends Component {
     try {
       await api.delete(`/tools/${id}`);
 
-      const tools = this.state.tools.filter(tool => tool._id !== id);
+      const tools = this.props.tools.filter(tool => tool._id !== id);
 
-      this.setState({ tools });
+      this.props.setTools(tools);
     } catch (error) {
       const errorMessage = error.response.data.message;
       this.setState({ errorMessage });
@@ -99,7 +102,7 @@ class Home extends Component {
   };
 
   render() {
-    const { tools, searchFor, searchByTag, authContent, searching } = this.state;
+    const { searchFor, searchByTag, authContent, searching } = this.state;
 
     const addTool = (
       <ManageTools
@@ -115,7 +118,9 @@ class Home extends Component {
       <StyledMain>
         <h1>VUTTR</h1>
         <h3>Very Useful Tools to Remember</h3>
+
         {addTool}
+
         <ActionsBar
           searchFor={searchFor}
           searchByTag={searchByTag}
@@ -125,8 +130,8 @@ class Home extends Component {
           showButton={authContent}
           toggleShow={this.toggleModalHandler}
         />
-        {tools
-          ? tools.map(tool => (
+        {this.props.tools
+          ? this.props.tools.map(tool => (
               <Tool
                 key={tool._id}
                 title={tool.title}
@@ -144,4 +149,13 @@ class Home extends Component {
   }
 }
 
-export default withRouter(Home);
+const mapStateToProps = state => ({
+  tools: state.toolsReducer.tools
+});
+
+const mapDispatchToProps = dispatch => bindActionCreators(toolsActions, dispatch);
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(Home));
