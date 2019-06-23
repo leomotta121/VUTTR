@@ -1,5 +1,9 @@
 import React, { Component } from 'react';
 import api from '../../services/api';
+import { withRouter } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import * as toolsActions from '../../store/ducks/tools';
 
 import FormValidator from '../../helper/FormValidator';
 
@@ -45,7 +49,13 @@ class ManageTools extends Component {
         method: 'isByteLength',
         args: [{ min: 0, max: 12 }],
         validWhen: true,
-        message: 'Tag is too long'
+        message: 'Tag is too long.'
+      },
+      {
+        field: 'tags',
+        method: 'isEmpty',
+        validWhen: false,
+        message: 'Add at least one tag.'
       }
     ]);
 
@@ -55,10 +65,18 @@ class ManageTools extends Component {
       link: '',
       tagInput: '',
       tags: [],
-      validation: this.validator.valid()
+      validation: this.validator.valid(),
+      editMode: false
     };
 
     this.submitted = false;
+  }
+
+  componentDidMount() {
+    const { title, description, link, tags } = this.props.tool;
+    if (title) {
+      this.setState({ editMode: true, title, description, link, tags });
+    }
   }
 
   inputChangedHandler = event => {
@@ -77,7 +95,38 @@ class ManageTools extends Component {
     this.submitted = true;
 
     if (validation.isValid && this.state.tags.length > 0) {
-      console.log('submitted');
+      if (this.state.editMode) {
+        const { title, description, link, tags } = this.state;
+        const id = this.props.tool._id;
+
+        const response = await api.patch(`/tools/${id}`, {
+          title,
+          description,
+          link,
+          tags
+        });
+
+        const tool = response.data;
+        this.props.editTool(tool);
+        this.submitted = false;
+        this.setState({ title: '', description: '', link: '', tags: [] });
+        this.props.toggleShow();
+      } else {
+        const { title, description, link, tags } = this.state;
+
+        const response = await api.post('/tools', {
+          title,
+          description,
+          link,
+          tags
+        });
+
+        const tool = response.data;
+        this.props.addTool(tool);
+        this.submitted = false;
+        this.setState({ title: '', description: '', link: '', tags: [] });
+        this.props.toggleShow();
+      }
     }
   };
 
@@ -108,10 +157,13 @@ class ManageTools extends Component {
   };
 
   render() {
-    const { title, description, link, tags } = this.state;
+    const { title, description, link, tags, tagInput, editMode } = this.state;
     let validation = this.submitted ? this.validator.validate(this.state) : this.state.validation;
     let disabledButton = true;
     let customTagMessage;
+    let modalTitle = '+ Add new tool';
+
+    if (editMode) modalTitle = 'Edit Tool';
 
     if (title && description && link && tags.length > 0 && validation.isValid)
       disabledButton = null;
@@ -128,7 +180,7 @@ class ManageTools extends Component {
     ));
 
     return (
-      <Modal toggleShow={this.props.toggleShow} show={this.props.show} title={this.props.title}>
+      <Modal toggleShow={this.props.toggleShow} show={this.props.show} title={modalTitle}>
         <Container>
           <div className={validation.title.isInvalid ? 'has-error' : null}>
             <label htmlFor="title">Title:</label>
@@ -137,7 +189,7 @@ class ManageTools extends Component {
               placeholder="e.g. React.js"
               name="title"
               onChange={this.inputChangedHandler}
-              value={this.state.title}
+              value={title}
             />
             <span className="error-message">{validation.title.message}</span>
           </div>
@@ -149,7 +201,7 @@ class ManageTools extends Component {
               placeholder="e.g. It is a good tool for..."
               name="description"
               onChange={this.inputChangedHandler}
-              value={this.state.description}
+              value={description}
             />
             <span className="error-message">{validation.description.message}</span>
           </div>
@@ -161,7 +213,7 @@ class ManageTools extends Component {
               placeholder="e.g. http://www.express.com"
               name="link"
               onChange={this.inputChangedHandler}
-              value={this.state.link}
+              value={link}
             />
             <span className="error-message">{validation.link.message}</span>
           </div>
@@ -174,6 +226,8 @@ class ManageTools extends Component {
                 ? 'has-error'
                 : null || customTagMessage
                 ? 'has-error'
+                : null || validation.tags.isInvalid
+                ? 'has-error'
                 : null
             }
           >
@@ -182,12 +236,18 @@ class ManageTools extends Component {
               type="text"
               placeholder="Press Enter or Space to add tags"
               name="tagInput"
-              value={this.state.tagInput}
+              value={tagInput}
               onChange={this.inputChangedHandler}
               onKeyDown={this.inputKeyDownHandler}
             />
             <span className="error-message">
-              {!customTagMessage ? validation.tagInput.message : customTagMessage}
+              {customTagMessage
+                ? customTagMessage
+                : null || validation.tags.message
+                ? validation.tags.message
+                : null || validation.tagInput.message
+                ? validation.tagInput.message
+                : null}
             </span>
           </div>
 
@@ -208,4 +268,9 @@ class ManageTools extends Component {
   }
 }
 
-export default ManageTools;
+const mapDispatchToProps = dispatch => bindActionCreators(toolsActions, dispatch);
+
+export default connect(
+  null,
+  mapDispatchToProps
+)(withRouter(ManageTools));

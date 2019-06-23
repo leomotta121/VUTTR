@@ -14,6 +14,7 @@ import ManageTools from '../../components/ManageTools';
 
 class Home extends Component {
   state = {
+    tool: {},
     searchFor: '',
     authContent: false,
     searchByTag: false,
@@ -97,18 +98,23 @@ class Home extends Component {
     }
   };
 
+  editToolHandler = tool => {
+    this.toggleModalHandler();
+    this.setState({ tool });
+  };
+
   toggleModalHandler = () => {
-    this.setState({ showAddToolModal: !this.state.showAddToolModal });
+    this.setState({ showAddToolModal: !this.state.showAddToolModal, tool: {} });
   };
 
   render() {
-    const { searchFor, searchByTag, authContent, searching } = this.state;
+    const { searchFor, searchByTag, authContent, searching, showAddToolModal } = this.state;
 
     const addTool = (
       <ManageTools
-        title="+ Add new Tool"
         toggleShow={this.toggleModalHandler}
         show={this.state.showAddToolModal}
+        tool={this.state.tool}
       >
         test modaltest modaltest modaltest modaltest modaltest modal
       </ManageTools>
@@ -119,7 +125,7 @@ class Home extends Component {
         <h1>VUTTR</h1>
         <h3>Very Useful Tools to Remember</h3>
 
-        {addTool}
+        {showAddToolModal ? addTool : null}
 
         <ActionsBar
           searchFor={searchFor}
@@ -140,6 +146,7 @@ class Home extends Component {
                 tags={tool.tags}
                 showButton={authContent}
                 onDelete={() => this.deleteToolHandler(tool._id)}
+                onEdit={() => this.editToolHandler(tool)}
                 getToolsByTag={this.tagClickedHandler}
               />
             ))

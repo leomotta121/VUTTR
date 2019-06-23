@@ -13,7 +13,7 @@ const Tool = props => {
       <StyledArticle>
         <header>
           <h2>
-            <a href={`http://${props.link}`} rel="noopener noreferrer" target="_blank">
+            <a href={`${props.link}`} rel="noopener noreferrer" target="_blank">
               {props.title}
             </a>
           </h2>
@@ -29,6 +29,7 @@ const Tool = props => {
                 Remove
               </Button>
               <Button
+                onClick={props.onEdit}
                 bgColor={colors.regular.blue}
                 hoverColor={colors.dark.blue}
                 activeColor={colors.darker.blue}

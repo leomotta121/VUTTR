@@ -71,15 +71,16 @@ exports.patchTool = async (req, res, next) => {
     if (link) tool.link = link;
     if (description) tool.description = description;
     if (tags) {
-      tags.forEach(newTag => {
-        const canUpdate = tool.tags.includes(newTag);
-        if (!canUpdate) tool.tags.push(newTag);
-      });
+      const deleteTags = tool.tags.filter(tag => tags.includes(tag));
+      const addTags = tags.filter(tag => !tool.tags.includes(tag));
+      const newTags = [...deleteTags, ...addTags];
+
+      tool.tags = [...new Set(newTags)];
     }
 
     await tool.save();
 
-    res.status(200).json({ message: 'Tool updated!' });
+    res.status(200).json(tool);
   } catch (error) {
     next(error);
   }
