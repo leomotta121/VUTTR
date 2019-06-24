@@ -4,60 +4,21 @@ import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as toolsActions from '../../store/ducks/tools';
-
 import FormValidator from '../../helper/FormValidator';
-
-import colors from '../../helper/colors';
+import { afterSubmitRules, liveRules } from './validationRules';
 
 import Container from './style';
 import Modal from '../Modal';
-import Input from '../Input';
-import Button from '../Button';
-import Card from '../Card';
+import AddOrRemoveModal from './AddOrRemoveModal';
+import DeleteModal from './DeleteModal';
 
 class ManageTools extends Component {
   constructor(props) {
     super(props);
 
-    this.validator = new FormValidator([
-      {
-        field: 'title',
-        method: 'isEmpty',
-        validWhen: false,
-        message: 'Title is required.'
-      },
-      {
-        field: 'description',
-        method: 'isEmpty',
-        validWhen: false,
-        message: 'Description is required.'
-      },
-      {
-        field: 'link',
-        method: 'isEmpty',
-        validWhen: false,
-        message: 'Link is required.'
-      },
-      {
-        field: 'link',
-        method: 'isURL',
-        validWhen: true,
-        message: 'Not valid url.'
-      },
-      {
-        field: 'tagInput',
-        method: 'isByteLength',
-        args: [{ min: 0, max: 12 }],
-        validWhen: true,
-        message: 'Tag is too long.'
-      },
-      {
-        field: 'tags',
-        method: 'isEmpty',
-        validWhen: false,
-        message: 'Add at least one tag.'
-      }
-    ]);
+    this.liveValidator = new FormValidator(liveRules);
+
+    this.afterSubmitValidator = new FormValidator(afterSubmitRules);
 
     this.state = {
       _id: '',
@@ -66,7 +27,7 @@ class ManageTools extends Component {
       link: '',
       tagInput: '',
       tags: [],
-      validation: this.validator.valid(),
+      afterSubmitValidation: this.afterSubmitValidator.valid(),
       editMode: false,
       deleteMode: false
     };
@@ -91,14 +52,25 @@ class ManageTools extends Component {
     });
   };
 
+  resetItialState = () => {
+    this.submitted = false;
+    this.setState({ title: '', description: '', link: '', tags: [] });
+    this.props.toggleShow();
+  };
+
+  redirectErrorPages = status => {
+    if (status === 401) this.props.history.push('/signin');
+    if (status === 500) this.props.history.push('/internal-error');
+  };
+
   formSubmitHandler = async event => {
     event.preventDefault();
 
-    const validation = this.validator.validate(this.state);
-    this.setState({ validation });
+    const afterSubmitValidator = this.afterSubmitValidator.validate(this.state);
+    this.setState({ validation: afterSubmitValidator });
     this.submitted = true;
 
-    if (validation.isValid && this.state.tags.length > 0) {
+    if (afterSubmitValidator.isValid && this.state.tags.length > 0) {
       if (this.state.editMode) {
         const { title, description, link, tags } = this.state;
         const id = this.props.tool._id;
@@ -113,10 +85,10 @@ class ManageTools extends Component {
 
           const tool = response.data;
           this.props.editTool(tool);
-          this.submitted = false;
-          this.setState({ title: '', description: '', link: '', tags: [] });
-          this.props.toggleShow();
-        } catch (error) {}
+          this.resetItialState();
+        } catch (error) {
+          this.redirectErrorPages(error.response.status);
+        }
       } else if (this.state.deleteMode) {
         const id = this.props.tool._id;
 
@@ -124,36 +96,39 @@ class ManageTools extends Component {
           await api.delete(`/tools/${id}`);
 
           this.props.deleteTool(id);
-          this.submitted = false;
-          this.setState({ title: '', description: '', link: '', tags: [] });
-          this.props.toggleShow();
-        } catch (error) {}
+          this.resetItialState();
+        } catch (error) {
+          this.redirectErrorPages(error.response.status);
+        }
       } else {
         const { title, description, link, tags } = this.state;
 
-        const response = await api.post('/tools', {
-          title,
-          description,
-          link,
-          tags
-        });
+        try {
+          const response = await api.post('/tools', {
+            title,
+            description,
+            link,
+            tags
+          });
 
-        const tool = response.data;
-        this.props.addTool(tool);
-        this.submitted = false;
-        this.setState({ title: '', description: '', link: '', tags: [] });
-        this.props.toggleShow();
+          const tool = response.data;
+          this.props.addTool(tool);
+          this.resetItialState();
+        } catch (error) {
+          this.redirectErrorPages(error.response.status);
+        }
       }
     }
   };
 
   inputKeyDownHandler = event => {
-    const validation = this.validator.validate(this.state);
+    const afterSubmitValidator = this.afterSubmitValidator.validate(this.state);
+    const liveValidator = this.liveValidator.validate(this.state);
 
     if (
       (event.keyCode === 13 || event.keyCode === 32) &&
-      !validation.tagInput.message &&
-      this.state.tagInput.length > 0
+      !afterSubmitValidator.tagInput.message &&
+      !liveValidator.tagInput.message
     ) {
       const { value } = event.target;
       const tags = this.state.tags;
@@ -175,138 +150,20 @@ class ManageTools extends Component {
 
   render() {
     const { title, description, link, tags, tagInput, editMode, deleteMode } = this.state;
-    let validation = this.submitted ? this.validator.validate(this.state) : this.state.validation;
+    let afterSubmitValidator = this.submitted
+      ? this.afterSubmitValidator.validate(this.state)
+      : this.state.afterSubmitValidation;
+
+    const liveValidator = this.liveValidator.validate(this.state);
+
     let disabledButton = true;
-    let customTagMessage;
 
     let modalTitle = '+ Add new tool';
     if (editMode) modalTitle = 'Edit Tool';
     if (deleteMode) modalTitle = 'Delete Tool';
 
-    if (title && description && link && tags.length > 0 && validation.isValid)
+    if (title && description && link && tags.length > 0 && afterSubmitValidator.isValid)
       disabledButton = null;
-
-    if (this.state.tagInput.length > 12) customTagMessage = 'Tag is too long';
-
-    const tagsAdded = tags.map(tag => (
-      <Card key={tag} className="tag-container">
-        <span className="delete-tag" onClick={() => this.removeTagHandler(tag)}>
-          x
-        </span>
-        <span className="tag"> {`#${tag}`}</span>
-      </Card>
-    ));
-
-    const AddOrRemoveModal = (
-      <Container>
-        <div className={validation.title.isInvalid ? 'has-error' : null}>
-          <label htmlFor="title">Title:</label>
-          <Input
-            type="text"
-            placeholder="e.g. React.js"
-            name="title"
-            onChange={this.inputChangedHandler}
-            value={title}
-          />
-          <span className="error-message">{validation.title.message}</span>
-        </div>
-
-        <div className={validation.description.isInvalid ? 'has-error' : null}>
-          <label htmlFor="description">Description:</label>
-          <Input
-            type="text"
-            placeholder="e.g. It is a good tool for..."
-            name="description"
-            onChange={this.inputChangedHandler}
-            value={description}
-          />
-          <span className="error-message">{validation.description.message}</span>
-        </div>
-
-        <div className={validation.link.isInvalid ? 'has-error' : null}>
-          <label htmlFor="link">Link:</label>
-          <Input
-            type="text"
-            placeholder="e.g. http://www.express.com"
-            name="link"
-            onChange={this.inputChangedHandler}
-            value={link}
-          />
-          <span className="error-message">{validation.link.message}</span>
-        </div>
-
-        {tagsAdded}
-
-        <div
-          className={
-            validation.tagInput.isInvalid
-              ? 'has-error'
-              : null || customTagMessage
-              ? 'has-error'
-              : null || validation.tags.isInvalid
-              ? 'has-error'
-              : null
-          }
-        >
-          <label htmlFor="tagInput">Tags:</label>
-          <Input
-            type="text"
-            placeholder="Press Enter or Space to add tags"
-            name="tagInput"
-            value={tagInput}
-            onChange={this.inputChangedHandler}
-            onKeyDown={this.inputKeyDownHandler}
-          />
-          <span className="error-message">
-            {customTagMessage
-              ? customTagMessage
-              : null || validation.tags.message
-              ? validation.tags.message
-              : null || validation.tagInput.message
-              ? validation.tagInput.message
-              : null}
-          </span>
-        </div>
-
-        <Button
-          onClick={this.formSubmitHandler}
-          bgColor={colors.regular.blue}
-          hoverColor={colors.dark.blue}
-          activeColor={colors.darker.blue}
-          fontColor={colors.regular.white}
-          disabledColor={colors.lighter.blue}
-          disabled={disabledButton}
-        >
-          Send
-        </Button>
-      </Container>
-    );
-
-    const deleteModal = (
-      <Container>
-        Are you sure you want to remove <strong>{title}</strong>?
-        <div className="delete-actions">
-          <Button
-            onClick={this.props.toggleShow}
-            bgColor={colors.regular.red}
-            hoverColor={colors.dark.red}
-            activeColor={colors.darker.red}
-            fontColor={colors.regular.white}
-          >
-            cancel
-          </Button>
-          <Button
-            onClick={this.formSubmitHandler}
-            bgColor={colors.regular.blue}
-            hoverColor={colors.dark.blue}
-            activeColor={colors.darker.blue}
-            fontColor={colors.regular.white}
-          >
-            Yes, remove
-          </Button>
-        </div>
-      </Container>
-    );
 
     return (
       <Modal
@@ -315,7 +172,32 @@ class ManageTools extends Component {
         title={modalTitle}
         overflow={deleteMode ? 'hidden' : null}
       >
-        {deleteMode ? deleteModal : AddOrRemoveModal}
+        {deleteMode ? (
+          <Container>
+            <DeleteModal
+              title={title}
+              toggleShow={this.props.toggleShow}
+              formSubmitHandler={this.formSubmitHandler}
+            />
+          </Container>
+        ) : (
+          <Container>
+            <AddOrRemoveModal
+              tags={tags}
+              removeTagHandler={this.removeTagHandler}
+              title={title}
+              description={description}
+              link={link}
+              tagInput={tagInput}
+              afterSubmitValidator={afterSubmitValidator}
+              liveValidator={liveValidator}
+              disabledButton={disabledButton}
+              formSubmitHandler={this.formSubmitHandler}
+              inputChangedHandler={this.inputChangedHandler}
+              inputKeyDownHandler={this.inputKeyDownHandler}
+            />
+          </Container>
+        )}
       </Modal>
     );
   }

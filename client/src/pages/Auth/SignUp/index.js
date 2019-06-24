@@ -2,12 +2,11 @@ import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import api from '../../../services/api';
 
-import StyledForm from './style';
+import FormValidator from '../../../helper/FormValidator';
+import { afterSubmitRules } from './validationRules';
 
 import color from '../../../helper/colors';
-
-import FormValidator from '../../../helper/FormValidator';
-
+import StyledForm from './style';
 import Input from '../../../components/Input';
 import Card from '../../../components/Card';
 import Button from '../../../components/Button';
@@ -17,50 +16,7 @@ class SignUp extends Component {
   constructor(props) {
     super(props);
 
-    this.validator = new FormValidator([
-      {
-        field: 'name',
-        method: 'isEmpty',
-        validWhen: false,
-        message: 'First name is required.'
-      },
-      {
-        field: 'lastName',
-        method: 'isEmpty',
-        validWhen: false,
-        message: 'Last name is required.'
-      },
-      {
-        field: 'email',
-        method: 'isEmpty',
-        validWhen: false,
-        message: 'Email is required.'
-      },
-      {
-        field: 'email',
-        method: 'isEmail',
-        validWhen: true,
-        message: 'This is not a valid email.'
-      },
-      {
-        field: 'password',
-        method: 'isEmpty',
-        validWhen: false,
-        message: 'Password is required.'
-      },
-      {
-        field: 'confirmPassword',
-        method: 'isEmpty',
-        validWhen: false,
-        message: 'Confirmation is required.'
-      },
-      {
-        field: 'confirmPassword',
-        method: this.passwordMatch,
-        validWhen: true,
-        message: 'Passwords do not match.'
-      }
-    ]);
+    this.afterSubmitValidator = new FormValidator(afterSubmitRules(this.passwordMatch));
 
     this.state = {
       name: '',
@@ -68,7 +24,7 @@ class SignUp extends Component {
       email: '',
       password: '',
       confirmPassword: '',
-      validation: this.validator.valid(),
+      validation: this.afterSubmitValidator.valid(),
       isEmailTaken: false,
       buttonClicked: false
     };
@@ -90,11 +46,14 @@ class SignUp extends Component {
     event.preventDefault();
     this.setState({ buttonClicked: true });
 
-    const validation = this.validator.validate(this.state);
-    this.setState({ validation });
+    const afterSubmitValidator = this.afterSubmitValidator.validate(this.state);
+    this.setState({ validation: afterSubmitValidator });
     this.submitted = true;
 
-    if (validation.isValid && this.passwordMatch(this.state.confirmPassword, this.state)) {
+    if (
+      afterSubmitValidator.isValid &&
+      this.passwordMatch(this.state.confirmPassword, this.state)
+    ) {
       const { name, lastName, email, password } = this.state;
 
       try {
@@ -120,15 +79,18 @@ class SignUp extends Component {
 
   render() {
     const { name, lastName, email, password, confirmPassword, isEmailTaken } = this.state;
-    let validation = this.submitted ? this.validator.validate(this.state) : this.state.validation;
+    let afterSubmitValidator = this.submitted
+      ? this.afterSubmitValidator.validate(this.state)
+      : this.state.validation;
+
     let disabledButton = true;
     let emailTakenMessage;
 
-    if (name && lastName && email && password && confirmPassword && validation.isValid)
+    if (name && lastName && email && password && confirmPassword && afterSubmitValidator.isValid)
       disabledButton = null;
 
     if (isEmailTaken) {
-      validation.email.isInvalid = true;
+      afterSubmitValidator.email.isInvalid = true;
       emailTakenMessage = 'Email already in use';
     }
 
@@ -137,62 +99,57 @@ class SignUp extends Component {
         <StyledForm onSubmit={this.formSubmitHandler}>
           <h1>Sign Up</h1>
 
-          <div className={validation.name.isInvalid ? 'has-error' : null}>
-            <label htmlFor="name">First Name:</label>
-            <Input
-              type="text"
-              placeholder="e.g. John"
-              name="name"
-              onChange={this.inputChangedHandler}
-            />
-            <span className="error-message">{validation.name.message}</span>
-          </div>
+          <Input
+            type="text"
+            placeholder="e.g. John"
+            name="name"
+            value={name}
+            onChange={this.inputChangedHandler}
+            afterSubmitValidator={afterSubmitValidator.name}
+            label="Name"
+          />
 
-          <div className={validation.lastName.isInvalid ? 'has-error' : null}>
-            <label htmlFor="lastName">Last Name:</label>
-            <Input
-              type="text"
-              placeholder="e.g. Doe"
-              name="lastName"
-              onChange={this.inputChangedHandler}
-            />
-            <span className="error-message">{validation.lastName.message}</span>
-          </div>
+          <Input
+            type="text"
+            placeholder="e.g. Doe"
+            name="lastName"
+            value={lastName}
+            onChange={this.inputChangedHandler}
+            afterSubmitValidator={afterSubmitValidator.lastName}
+            label="Last Name"
+          />
 
-          <div className={validation.email.isInvalid ? 'has-error' : null}>
-            <label htmlFor="email">Email:</label>
-            <Input
-              type="email"
-              placeholder="e.g. john@doe.com"
-              name="email"
-              onChange={this.inputChangedHandler}
-            />
-            <span className="error-message">
-              {emailTakenMessage ? emailTakenMessage : validation.email.message}
-            </span>
-          </div>
+          <Input
+            type="email"
+            placeholder="e.g. john@doe.com"
+            name="email"
+            value={email}
+            onChange={this.inputChangedHandler}
+            afterSubmitValidator={afterSubmitValidator.email}
+            label="Email"
+            isEmailTaken={isEmailTaken}
+            emailTakenMessage={emailTakenMessage}
+          />
 
-          <div className={validation.password.isInvalid ? 'has-error' : null}>
-            <label htmlFor="password">Password:</label>
-            <Input
-              type="password"
-              placeholder="password"
-              name="password"
-              onChange={this.inputChangedHandler}
-            />
-            <span className="error-message">{validation.password.message}</span>
-          </div>
+          <Input
+            type="password"
+            placeholder="password"
+            name="password"
+            value={password}
+            onChange={this.inputChangedHandler}
+            afterSubmitValidator={afterSubmitValidator.password}
+            label="Password"
+          />
 
-          <div className={validation.confirmPassword.isInvalid ? 'has-error' : null}>
-            <label htmlFor="confirmPassword">Confirm Password:</label>
-            <Input
-              type="password"
-              placeholder="confirm password"
-              name="confirmPassword"
-              onChange={this.inputChangedHandler}
-            />
-            <span className="error-message">{validation.confirmPassword.message}</span>
-          </div>
+          <Input
+            type="password"
+            placeholder="confirm password"
+            name="confirmPassword"
+            value={confirmPassword}
+            onChange={this.inputChangedHandler}
+            afterSubmitValidator={afterSubmitValidator.confirmPassword}
+            label="Confirm Password"
+          />
 
           <Button
             type="submit"

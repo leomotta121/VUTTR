@@ -1,14 +1,13 @@
 import React, { Component } from 'react';
 import { withRouter, Link } from 'react-router-dom';
 import api from '../../../services/api';
-import { login } from '../../../services/auth';
 
-import StyledForm from './style';
+import { login } from '../../../services/auth';
+import FormValidator from '../../../helper/FormValidator';
+import { afterSubmitRules } from './validationsRules';
 
 import color from '../../../helper/colors';
-
-import FormValidator from '../../../helper/FormValidator';
-
+import StyledForm from './style';
 import Input from '../../../components/Input';
 import Card from '../../../components/Card';
 import Button from '../../../components/Button';
@@ -18,31 +17,12 @@ class SignIn extends Component {
   constructor(props) {
     super(props);
 
-    this.validator = new FormValidator([
-      {
-        field: 'email',
-        method: 'isEmpty',
-        validWhen: false,
-        message: 'Email is required.'
-      },
-      {
-        field: 'email',
-        method: 'isEmail',
-        validWhen: true,
-        message: 'This is not a valid email.'
-      },
-      {
-        field: 'password',
-        method: 'isEmpty',
-        validWhen: false,
-        message: 'Password is required.'
-      }
-    ]);
+    this.afterSubmitValidator = new FormValidator(afterSubmitRules);
 
     this.state = {
       email: '',
       password: '',
-      validation: this.validator.valid(),
+      validation: this.afterSubmitValidator.valid(),
       buttonClicked: false,
       customEmailMessage: '',
       customPasswordMessage: ''
@@ -65,7 +45,7 @@ class SignIn extends Component {
     event.preventDefault();
     this.setState({ buttonClicked: true });
 
-    const validation = this.validator.validate(this.state);
+    const validation = this.afterSubmitValidator.validate(this.state);
     this.setState({ validation });
     this.submitted = true;
 
@@ -97,57 +77,39 @@ class SignIn extends Component {
 
   render() {
     const { email, password, customEmailMessage, customPasswordMessage } = this.state;
-    let validation = this.submitted ? this.validator.validate(this.state) : this.state.validation;
+    let afterSubmitValidator = this.submitted
+      ? this.afterSubmitValidator.validate(this.state)
+      : this.state.validation;
     let disabledButton = true;
 
-    if (email && password && validation.isValid) disabledButton = null;
+    if (email && password && afterSubmitValidator.isValid) disabledButton = null;
 
     return (
       <Card mtb="30">
         <StyledForm onSubmit={this.formSubmitHandler}>
           <h1>Sign In</h1>
 
-          <div
-            className={
-              validation.email.isInvalid
-                ? 'has-error'
-                : null || customEmailMessage
-                ? 'has-error'
-                : null
-            }
-          >
-            <label htmlFor="email">Email:</label>
-            <Input
-              type="email"
-              placeholder="e.g. john@doe.com"
-              name="email"
-              onChange={this.inputChangedHandler}
-            />
-            <span className="error-message">
-              {customEmailMessage ? customEmailMessage : validation.email.message}
-            </span>
-          </div>
+          <Input
+            type="email"
+            placeholder="e.g. john@doe.com"
+            name="email"
+            value={email}
+            onChange={this.inputChangedHandler}
+            afterSubmitValidator={afterSubmitValidator.email}
+            label="Email"
+            customEmailMessage={customEmailMessage}
+          />
 
-          <div
-            className={
-              validation.password.isInvalid
-                ? 'has-error'
-                : null || customPasswordMessage
-                ? 'has-error'
-                : null
-            }
-          >
-            <label htmlFor="password">Password:</label>
-            <Input
-              type="password"
-              placeholder="password"
-              name="password"
-              onChange={this.inputChangedHandler}
-            />
-            <span className="error-message">
-              {customPasswordMessage ? customPasswordMessage : validation.password.message}
-            </span>
-          </div>
+          <Input
+            type="password"
+            placeholder="password"
+            name="password"
+            value={password}
+            onChange={this.inputChangedHandler}
+            afterSubmitValidator={afterSubmitValidator.password}
+            label="Password"
+            customPasswordMessage={customPasswordMessage}
+          />
 
           <Button
             type="submit"
