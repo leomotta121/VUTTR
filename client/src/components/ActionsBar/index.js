@@ -31,7 +31,7 @@ const ActionsBar = props => {
           </Button>
         </div>
 
-        <label>
+        <label className="container">
           <input
             className="checkbox"
             type="checkbox"
@@ -39,6 +39,7 @@ const ActionsBar = props => {
             name="searchByTag"
             checked={props.searchByTag}
           />
+          <span class="checkmark" />
           Search in tags only
         </label>
       </form>
