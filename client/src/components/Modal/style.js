@@ -6,13 +6,12 @@ const StyledDiv = styled.div`
   position: fixed;
   z-index: 500;
 
-  max-height: 520px;
   width: 400px;
+  max-height: 520px;
   overflow: ${props => (props.overflow ? props.overflow : 'scroll')};
   overflow-x: hidden;
 
   left: 50%;
-  top: 10%;
   margin-left: -200px;
 
   background-color: #fff;
@@ -41,8 +40,8 @@ const StyledDiv = styled.div`
   }
 
   @media (max-width: 450px) {
-    top: 1%;
-    max-height: 420px;
+    top: 3%;
+    max-height: 480px;
     width: 315px;
     margin-left: -157.5px;
   }

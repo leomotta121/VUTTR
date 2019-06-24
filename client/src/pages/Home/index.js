@@ -20,8 +20,7 @@ class Home extends Component {
     authContent: false,
     searchByTag: false,
     searching: false,
-    showManageTool: false,
-    errorMessage: ''
+    showManageTool: false
   };
 
   async componentDidMount() {
@@ -31,8 +30,7 @@ class Home extends Component {
       const tools = await api.get('/tools');
       this.props.setTools(tools.data);
     } catch (error) {
-      const errorMessage = error.response.data.message;
-      this.setState({ errorMessage });
+      if (error.response.status === 500) this.props.history.push('/internal-error');
     }
   }
 
@@ -58,8 +56,7 @@ class Home extends Component {
         this.props.setTools(tools.data);
         this.props.history.push(`/?tag=${searchFor}`);
       } catch (error) {
-        const errorMessage = error.response.data.message;
-        this.setState({ errorMessage, searching: false });
+        if (error.response.status === 500) this.props.history.push('/internal-error');
       }
     } else {
       try {
@@ -69,8 +66,7 @@ class Home extends Component {
 
         this.props.history.push(`/?title=${searchFor}`);
       } catch (error) {
-        const errorMessage = error.response.data.message;
-        this.setState({ errorMessage, searching: false });
+        if (error.response.status === 500) this.props.history.push('/internal-error');
       }
     }
   };
@@ -81,8 +77,7 @@ class Home extends Component {
       this.setState({ searching: false });
       this.props.setTools(tools.data);
     } catch (error) {
-      const errorMessage = error.response.data.message;
-      this.setState({ errorMessage });
+      if (error.response.status === 500) this.props.history.push('/internal-error');
     }
   };
 

@@ -66,6 +66,17 @@ const Container = styled.div`
       overflow: hidden;
     }
   }
+
+  @media (max-width: 460px) {
+    flex-direction: column;
+
+    .add-button {
+      position: fixed;
+      z-index: 100;
+      right: 10%;
+      bottom: 5%;
+    }
+  }
 `;
 
 export default Container;

@@ -7,7 +7,7 @@ const Modal = ({ children, toggleShow, show, title, ...rest }) => {
   const modal = (
     <>
       <Backdrop clicked={toggleShow} />
-      <StyledDiv {...rest}>
+      <StyledDiv key="pose" {...rest}>
         <header>
           <h3>{title}</h3>
           <div onClick={toggleShow}>x</div>

@@ -64,6 +64,8 @@ class SignIn extends Component {
       } catch (error) {
         this.setState({ buttonClicked: false });
 
+        if (error.response.status === 500) this.props.history.push('/internal-error');
+
         if (error.response.data.message === 'Email is not registered.')
           this.setState({ customEmailMessage: error.response.data.message });
 

@@ -24,6 +24,17 @@ const StyledArticle = styled.article`
   footer {
     margin-top: 10px;
   }
+
+  @media (max-width: 600px) {
+    header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    header .actions button {
+      margin-left: 0;
+    }
+  }
 `;
 
 export default StyledArticle;

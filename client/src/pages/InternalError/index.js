@@ -4,8 +4,8 @@ import Container from './style';
 
 const PageNotFound = () => (
   <Container>
-    <h1>Page Not Found</h1>
-    <p>We are sorry, we did not find the requested page.</p>
+    <h1>Oops!</h1>
+    <p>Error 500, this is an unexpected error, please contact us!</p>
   </Container>
 );
 

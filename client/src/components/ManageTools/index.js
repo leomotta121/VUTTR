@@ -171,9 +171,10 @@ class ManageTools extends Component {
         show={this.props.show}
         title={modalTitle}
         overflow={deleteMode ? 'hidden' : null}
+        key="pose1"
       >
         {deleteMode ? (
-          <Container>
+          <Container key="pose2">
             <DeleteModal
               title={title}
               toggleShow={this.props.toggleShow}
@@ -181,7 +182,7 @@ class ManageTools extends Component {
             />
           </Container>
         ) : (
-          <Container>
+          <Container key="pose3">
             <AddOrRemoveModal
               tags={tags}
               removeTagHandler={this.removeTagHandler}

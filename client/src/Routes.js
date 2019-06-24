@@ -10,6 +10,7 @@ import Home from './pages/Home';
 import SignIn from './pages/Auth/SignIn';
 import SignUp from './pages/Auth/SignUp';
 import PageNotFound from './pages/PageNotFound';
+import InternalError from './pages/InternalError';
 
 const Routes = () => (
   <BrowserRouter>
@@ -18,6 +19,7 @@ const Routes = () => (
       <Route exact path="/" component={Home} />
       <IsLogged path="/signin" component={SignIn} />
       <IsLogged path="/signup" component={SignUp} />
+      <Route path="/internal-error" component={InternalError} />
       <Route path="*" component={PageNotFound} />
     </Switch>
     <Footer />
