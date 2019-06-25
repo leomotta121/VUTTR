@@ -14,6 +14,8 @@ import Button from '../../../components/Button';
 import Spinner from '../../../components/Spinner';
 
 class SignIn extends Component {
+  _isMounted = false;
+
   constructor(props) {
     super(props);
 
@@ -29,6 +31,14 @@ class SignIn extends Component {
     };
 
     this.submitted = false;
+  }
+
+  componentDidMount() {
+    this._isMounted = true;
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
   inputChangedHandler = event => {
@@ -50,9 +60,9 @@ class SignIn extends Component {
     this.submitted = true;
 
     if (validation.isValid) {
-      const { email, password } = this.state;
-
       try {
+        const { email, password } = this.state;
+
         const response = await api.post('/signin', {
           email,
           password
@@ -62,19 +72,17 @@ class SignIn extends Component {
 
         this.props.history.push('/');
       } catch (error) {
-        this.setState({ buttonClicked: false });
+        let customEmailMessage = error.response.data.message;
 
         if (error.response.status === 500) this.props.history.push('/internal-error');
 
-        if (error.response.data.message === 'Email is not registered.')
-          this.setState({ customEmailMessage: error.response.data.message });
-
-        if (error.response.data.message === 'Password is incorrect.')
-          this.setState({ customPasswordMessage: error.response.data.message });
+        if (this._isMounted) {
+          this.setState({ customEmailMessage: customEmailMessage, buttonClicked: false });
+        }
       }
     }
 
-    this.setState({ buttonClicked: false });
+    if (this._isMounted) this.setState({ buttonClicked: false });
   };
 
   render() {

@@ -14,6 +14,8 @@ import ManageTools from '../../components/ManageTools';
 import ReactPaginate from 'react-paginate';
 
 class Home extends Component {
+  _isMounted = false;
+
   state = {
     tool: {},
     action: '',
@@ -29,30 +31,50 @@ class Home extends Component {
   };
 
   async componentDidMount() {
-    if (isAuthenticated()) this.setState({ authContent: true });
+    this._isMounted = true;
+
+    if (isAuthenticated() && this._isMounted) this.setState({ authContent: true });
 
     try {
       const searchURLParam = new URLSearchParams(this.props.location.search);
       const page = searchURLParam.get('page');
       const tag = searchURLParam.get('tag');
       const title = searchURLParam.get('title');
+      let tagBool;
+      let titleBool;
       let tools;
 
       if (tag && !title) {
         tools = await api.get(`/tools/?page=${page}&tag=${tag}`);
-        this.setState({ navigateThruTags: true, navigateThruTitle: false });
+        tagBool = true;
+        titleBool = false;
       } else if (title && !tag) {
         tools = await api.get(`/tools/?page=${page}&title=${title}`);
-        this.setState({ navigateThruTitle: true, navigateThruTags: false });
+        tagBool = false;
+        titleBool = true;
       } else {
         tools = await api.get(`/tools/?page=${page ? page : 1}`);
-        this.setState({ navigateThruTitle: false, navigateThruTags: false });
+        tagBool = false;
+        titleBool = false;
       }
+
       this.props.setTools(tools.data.docs);
-      this.setState({ totalPages: tools.data.totalPages, currentPage: tools.data.page - 1 });
+
+      if (this._isMounted) {
+        this.setState({
+          totalPages: tools.data.totalPages,
+          currentPage: tools.data.page - 1,
+          navigateThruTags: tagBool,
+          navigateThruTitle: titleBool
+        });
+      }
     } catch (error) {
       if (error.response.status === 500) this.props.history.push('/internal-error');
     }
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
   inputChangedHandler = event => {
@@ -73,14 +95,19 @@ class Home extends Component {
     if (this.state.searchByTag) {
       try {
         const tools = await api.get(`/tools/?tag=${searchFor}&page=1`);
-        this.setState({
-          searching: false,
-          navigateThruTags: true,
-          pageNavigationHandler: false,
-          totalPages: tools.data.totalPages,
-          currentPage: tools.data.page - 1
-        });
+
         this.props.setTools(tools.data.docs);
+
+        if (this._isMounted) {
+          this.setState({
+            searching: false,
+            navigateThruTags: true,
+            pageNavigationHandler: false,
+            totalPages: tools.data.totalPages,
+            currentPage: tools.data.page - 1
+          });
+        }
+
         this.props.history.push(`/?tag=${searchFor}&page=1`);
       } catch (error) {
         if (error.response.status === 500) this.props.history.push('/internal-error');
@@ -88,14 +115,18 @@ class Home extends Component {
     } else {
       try {
         const tools = await api.get(`/tools/?title=${searchFor}&page=1`);
-        this.setState({
-          searching: false,
-          navigateThruTags: false,
-          navigateThruTitle: true,
-          totalPages: tools.data.totalPages,
-          currentPage: tools.data.page - 1
-        });
+
         this.props.setTools(tools.data.docs);
+
+        if (this._isMounted) {
+          this.setState({
+            searching: false,
+            navigateThruTags: false,
+            navigateThruTitle: true,
+            totalPages: tools.data.totalPages,
+            currentPage: tools.data.page - 1
+          });
+        }
 
         this.props.history.push(`/?title=${searchFor}&page=1`);
       } catch (error) {
@@ -127,7 +158,9 @@ class Home extends Component {
         console.log('[Navigating], page: ' + page);
       }
 
-      this.setState({ totalPages: tools.data.totalPages, currentPage: tools.data.page - 1 });
+      if (this._isMounted) {
+        this.setState({ totalPages: tools.data.totalPages, currentPage: tools.data.page - 1 });
+      }
       this.props.setTools(tools.data.docs);
     } catch (error) {
       if (error.response.status === 500) this.props.history.push('/internal-error');
@@ -137,14 +170,19 @@ class Home extends Component {
   tagClickedHandler = async tag => {
     try {
       const tools = await api.get(`/tools?tag=${tag}&page=1`);
-      this.setState({
-        searching: false,
-        navigateThruTitle: false,
-        navigateThruTags: true,
-        totalPages: tools.data.totalPages,
-        currentPage: tools.data.page - 1
-      });
+
       this.props.setTools(tools.data.docs);
+
+      if (this._isMounted) {
+        this.setState({
+          searching: false,
+          navigateThruTitle: false,
+          navigateThruTags: true,
+          totalPages: tools.data.totalPages,
+          currentPage: tools.data.page - 1
+        });
+      }
+
       this.props.history.push(`/?tag=${tag}&page=1`);
     } catch (error) {
       if (error.response.status === 500) this.props.history.push('/internal-error');

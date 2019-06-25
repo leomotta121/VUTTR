@@ -13,6 +13,8 @@ import Button from '../../../components/Button';
 import Spinner from '../../../components/Spinner';
 
 class SignUp extends Component {
+  _isMounted = false;
+
   constructor(props) {
     super(props);
 
@@ -30,6 +32,14 @@ class SignUp extends Component {
     };
 
     this.submitted = false;
+  }
+
+  componentDidMount() {
+    this._isMounted = true;
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
   passwordMatch = (confirmation, state) => state.password === confirmation;
@@ -66,16 +76,21 @@ class SignUp extends Component {
 
         this.props.history.push('/signin');
       } catch (error) {
-        this.setState({ buttonClicked: false });
+        let isEmailTaken = false;
+
         if (error.response.status === 500) this.props.history.push('/internal-error');
 
         if (error.response.data.message === 'The email is already in use.') {
-          this.setState({ isEmailTaken: true });
+          isEmailTaken = true;
+        }
+
+        if (this._isMounted) {
+          this.setState({ isEmailTaken, buttonClicked: false });
         }
       }
     }
 
-    this.setState({ buttonClicked: false });
+    if (this._isMounted) this.setState({ buttonClicked: false });
   };
 
   render() {

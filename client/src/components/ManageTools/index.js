@@ -13,6 +13,8 @@ import AddOrRemoveModal from './AddOrRemoveModal';
 import DeleteModal from './DeleteModal';
 
 class ManageTools extends Component {
+  _isMounted = false;
+
   constructor(props) {
     super(props);
 
@@ -36,12 +38,18 @@ class ManageTools extends Component {
   }
 
   componentDidMount() {
+    this._isMounted = true;
+
     const { title, description, link, tags, _id } = this.props.tool;
     if (this.props.action === 'edit')
       this.setState({ editMode: true, title, description, link, tags });
 
     if (this.props.action === 'delete')
       this.setState({ deleteMode: true, title, description, link, tags, _id });
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
   }
 
   inputChangedHandler = event => {
@@ -54,8 +62,10 @@ class ManageTools extends Component {
 
   resetItialState = () => {
     this.submitted = false;
-    this.setState({ title: '', description: '', link: '', tags: [] });
     this.props.toggleShow();
+    if (this._isMounted) {
+      this.setState({ title: '', description: '', link: '', tags: [] });
+    }
   };
 
   redirectErrorPages = status => {
