@@ -1,5 +1,5 @@
 import React from 'react';
-import { withRouter, Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 
 import colors from '../../helper/colors';
 
@@ -46,11 +46,11 @@ const Tool = props => {
         <footer>
           <p>
             {props.tags.map(tag => (
-              <Link
+              <span
+                className="tag-span"
                 key={tag}
-                to={`/?tag=${tag}`}
                 onClick={() => props.getToolsByTag(tag)}
-              >{`#${tag} `}</Link>
+              >{`#${tag} `}</span>
             ))}
           </p>
         </footer>

@@ -2,15 +2,16 @@ import React, { Component } from 'react';
 import { withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as toolsActions from '../../store/ducks/tools';
-
 import api from '../../services/api';
+
+import * as toolsActions from '../../store/ducks/tools';
 import { isAuthenticated } from '../../services/auth';
 
 import StyledMain from './style';
 import Tool from '../../components/Tool';
 import ActionsBar from '../../components/ActionsBar';
 import ManageTools from '../../components/ManageTools';
+import ReactPaginate from 'react-paginate';
 
 class Home extends Component {
   state = {
@@ -20,15 +21,35 @@ class Home extends Component {
     authContent: false,
     searchByTag: false,
     searching: false,
-    showManageTool: false
+    showManageTool: false,
+    navigateThruTags: false,
+    navigateThruTitle: false,
+    totalPages: 1,
+    currentPage: 1
   };
 
   async componentDidMount() {
     if (isAuthenticated()) this.setState({ authContent: true });
 
     try {
-      const tools = await api.get('/tools');
-      this.props.setTools(tools.data);
+      const searchURLParam = new URLSearchParams(this.props.location.search);
+      const page = searchURLParam.get('page');
+      const tag = searchURLParam.get('tag');
+      const title = searchURLParam.get('title');
+      let tools;
+
+      if (tag && !title) {
+        tools = await api.get(`/tools/?page=${page}&tag=${tag}`);
+        this.setState({ navigateThruTags: true, navigateThruTitle: false });
+      } else if (title && !tag) {
+        tools = await api.get(`/tools/?page=${page}&title=${title}`);
+        this.setState({ navigateThruTitle: true, navigateThruTags: false });
+      } else {
+        tools = await api.get(`/tools/?page=${page ? page : 1}`);
+        this.setState({ navigateThruTitle: false, navigateThruTags: false });
+      }
+      this.props.setTools(tools.data.docs);
+      this.setState({ totalPages: tools.data.totalPages, currentPage: tools.data.page - 1 });
     } catch (error) {
       if (error.response.status === 500) this.props.history.push('/internal-error');
     }
@@ -51,31 +72,80 @@ class Home extends Component {
 
     if (this.state.searchByTag) {
       try {
-        const tools = await api.get(`/tools?tag=${searchFor}`);
-        this.setState({ searching: false });
-        this.props.setTools(tools.data);
-        this.props.history.push(`/?tag=${searchFor}`);
+        const tools = await api.get(`/tools/?tag=${searchFor}&page=1`);
+        this.setState({
+          searching: false,
+          navigateThruTags: true,
+          pageNavigationHandler: false,
+          totalPages: tools.data.totalPages,
+          currentPage: tools.data.page - 1
+        });
+        this.props.setTools(tools.data.docs);
+        this.props.history.push(`/?tag=${searchFor}&page=1`);
       } catch (error) {
         if (error.response.status === 500) this.props.history.push('/internal-error');
       }
     } else {
       try {
-        const tools = await api.get(`/tools?title=${searchFor}`);
-        this.setState({ searching: false });
-        this.props.setTools(tools.data);
+        const tools = await api.get(`/tools/?title=${searchFor}&page=1`);
+        this.setState({
+          searching: false,
+          navigateThruTags: false,
+          navigateThruTitle: true,
+          totalPages: tools.data.totalPages,
+          currentPage: tools.data.page - 1
+        });
+        this.props.setTools(tools.data.docs);
 
-        this.props.history.push(`/?title=${searchFor}`);
+        this.props.history.push(`/?title=${searchFor}&page=1`);
       } catch (error) {
         if (error.response.status === 500) this.props.history.push('/internal-error');
       }
     }
   };
 
+  pageNavigationHandler = async index => {
+    try {
+      const page = index.selected + 1;
+      const { navigateThruTags, navigateThruTitle } = this.state;
+      const searchURLParam = new URLSearchParams(this.props.location.search);
+      const tag = searchURLParam.get('tag');
+      const title = searchURLParam.get('title');
+      let tools;
+
+      if (navigateThruTags) {
+        tools = await api.get(`/tools/?page=${page}&tag=${tag}`);
+        this.props.history.push(`/?tag=${tag}&page=${page}`);
+        console.log('[Navigating thru tags], page: ' + page);
+      } else if (navigateThruTitle) {
+        tools = await api.get(`/tools/?page=${page}&title=${title}`);
+        this.props.history.push(`/?title=${title}&page=${page}`);
+        console.log('[Navigating thru title], page: ' + page);
+      } else {
+        tools = await api.get(`/tools/?page=${page}`);
+        this.props.history.push(`/?page=${page}`);
+        console.log('[Navigating], page: ' + page);
+      }
+
+      this.setState({ totalPages: tools.data.totalPages, currentPage: tools.data.page - 1 });
+      this.props.setTools(tools.data.docs);
+    } catch (error) {
+      if (error.response.status === 500) this.props.history.push('/internal-error');
+    }
+  };
+
   tagClickedHandler = async tag => {
     try {
-      const tools = await api.get(`/tools?tag=${tag}`);
-      this.setState({ searching: false });
-      this.props.setTools(tools.data);
+      const tools = await api.get(`/tools?tag=${tag}&page=1`);
+      this.setState({
+        searching: false,
+        navigateThruTitle: false,
+        navigateThruTags: true,
+        totalPages: tools.data.totalPages,
+        currentPage: tools.data.page - 1
+      });
+      this.props.setTools(tools.data.docs);
+      this.props.history.push(`/?tag=${tag}&page=1`);
     } catch (error) {
       if (error.response.status === 500) this.props.history.push('/internal-error');
     }
@@ -98,23 +168,28 @@ class Home extends Component {
       searching,
       showManageTool,
       tool,
-      action
+      action,
+      totalPages
     } = this.state;
 
-    const addTool = (
-      <ManageTools
-        toggleShow={this.toggleManageToolHandler}
-        show={showManageTool}
-        tool={tool}
-        action={action}
-      >
-        test modaltest modaltest modaltest modaltest modaltest modal
-      </ManageTools>
-    );
+    let error;
+    let shouldRenderPagination = false;
+
+    if (this.props.tools.length < 1) error = 'Sorry, nothing was found :(';
+    if (totalPages > 1) shouldRenderPagination = true;
 
     return (
       <StyledMain>
-        {showManageTool ? addTool : null}
+        {showManageTool ? (
+          <ManageTools
+            toggleShow={this.toggleManageToolHandler}
+            show={showManageTool}
+            tool={tool}
+            action={action}
+          >
+            test modaltest modaltest modaltest modaltest modaltest modal
+          </ManageTools>
+        ) : null}
 
         <h1>VUTTR</h1>
         <h3>Very Useful Tools to Remember</h3>
@@ -128,21 +203,37 @@ class Home extends Component {
           showButton={authContent}
           toggleShow={this.toggleManageToolHandler}
         />
-        {this.props.tools
-          ? this.props.tools.map(tool => (
-              <Tool
-                key={tool._id}
-                title={tool.title}
-                link={tool.link}
-                description={tool.description}
-                tags={tool.tags}
-                showButton={authContent}
-                onDelete={() => this.actionButtonClicked(tool, 'delete')}
-                onEdit={() => this.actionButtonClicked(tool, 'edit')}
-                getToolsByTag={this.tagClickedHandler}
-              />
-            ))
-          : null}
+        {!error ? (
+          this.props.tools.map(tool => (
+            <Tool
+              key={tool._id}
+              title={tool.title}
+              link={tool.link}
+              description={tool.description}
+              tags={tool.tags}
+              showButton={authContent}
+              onDelete={() => this.actionButtonClicked(tool, 'delete')}
+              onEdit={() => this.actionButtonClicked(tool, 'edit')}
+              getToolsByTag={this.tagClickedHandler}
+            />
+          ))
+        ) : (
+          <h3>{error}</h3>
+        )}
+
+        {shouldRenderPagination ? (
+          <ReactPaginate
+            pageCount={this.state.totalPages}
+            pageRangeDisplayed={3}
+            marginPagesDisplayed={3}
+            onPageChange={index => this.pageNavigationHandler(index)}
+            forcePage={this.state.currentPage}
+            containerClassName="pagination-container"
+            activeLinkClassName="active"
+            nextLabel="Next >"
+            previousLabel="< Previous"
+          />
+        ) : null}
       </StyledMain>
     );
   }

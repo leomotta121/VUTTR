@@ -39,7 +39,7 @@ const ActionsBar = props => {
             name="searchByTag"
             checked={props.searchByTag}
           />
-          <span class="checkmark" />
+          <span className="checkmark" />
           Search in tags only
         </label>
       </form>

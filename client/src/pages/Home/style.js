@@ -1,5 +1,7 @@
 import styled from 'styled-components';
 
+import colors from '../../helper/colors';
+
 const StyledMain = styled.main`
   width: 100%;
   max-width: 600px;
@@ -10,6 +12,28 @@ const StyledMain = styled.main`
   h3 {
     max-width: 580px;
     margin: 10px auto;
+  }
+
+  .pagination-container {
+    display: block;
+    margin: 0 auto;
+    text-align: center;
+
+    li {
+      display: inline-block;
+      padding: 2px;
+      margin: 4px;
+      cursor: pointer;
+
+      .active {
+        color: ${colors.regular.ink};
+      }
+
+      a {
+        font-size: 18px;
+        color: ${colors.regular.blue};
+      }
+    }
   }
 `;
 

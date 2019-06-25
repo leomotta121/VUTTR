@@ -6,10 +6,6 @@ const StyledArticle = styled.article`
   margin: 10px auto;
   padding: 0.5em;
 
-  a {
-    text-decoration: none;
-  }
-
   header {
     display: flex;
     align-items: center;
@@ -23,6 +19,10 @@ const StyledArticle = styled.article`
 
   footer {
     margin-top: 10px;
+
+    .tag-span {
+      cursor: pointer;
+    }
   }
 
   @media (max-width: 600px) {
