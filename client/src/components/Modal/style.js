@@ -12,6 +12,7 @@ const StyledDiv = styled.div`
   overflow-x: hidden;
 
   left: 50%;
+  top: 10%;
   margin-left: -200px;
 
   background-color: #fff;

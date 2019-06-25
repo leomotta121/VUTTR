@@ -3,24 +3,31 @@ const Tool = require('../models/tool');
 
 exports.getTools = async (req, res, next) => {
   try {
-    const { tag, title } = req.query;
+    const { tag, title, page } = req.query;
+    let tools;
 
-    if (tag) {
-      const tools = await Tool.find({
-        tags: { $regex: tag, $options: 'i' }
-      });
-      return res.status(200).json(tools);
-    } else if (title) {
-      const tools = await Tool.find({
-        title: { $regex: title, $options: 'i' }
-      });
-      return res.status(200).json(tools);
+    if (tag && page && !title) {
+      tools = await Tool.paginate(
+        {
+          tags: { $regex: tag, $options: 'i' }
+        },
+        { page: page, limit: 3 }
+      );
+    } else if (title && page && !tag) {
+      tools = await Tool.paginate(
+        {
+          title: { $regex: title, $options: 'i' }
+        },
+        { page: page, limit: 3 }
+      );
+    } else if (!page && !tag && !title) {
+      tools = await Tool.find();
+      return res.status(200).json({ docs: tools });
+    } else {
+      tools = await Tool.paginate({}, { page: page, limit: 3 });
     }
 
-    const tools = await Tool.find();
-
-    if (tools.length <= 0)
-      throw new ApiError('Tools not found', 400, 'No tools registered with this tag.');
+    if (!tools) throw new ApiError('Tools not found', 400, 'No tools registered with this tag.');
 
     return res.status(200).json(tools);
   } catch (error) {
