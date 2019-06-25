@@ -14,6 +14,11 @@ const StyledMain = styled.main`
     margin: 10px auto;
   }
 
+  .error-message {
+    text-align: center;
+    margin: 2.4em 0;
+  }
+
   .pagination-container {
     display: block;
     margin: 0 auto;

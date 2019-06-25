@@ -218,7 +218,7 @@ class Home extends Component {
             />
           ))
         ) : (
-          <h3>{error}</h3>
+          <h3 className="error-message">{error}</h3>
         )}
 
         {shouldRenderPagination ? (
