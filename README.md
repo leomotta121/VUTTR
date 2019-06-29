@@ -44,4 +44,4 @@ or you may also run `docker-compose up --build` on the root of the project and i
 - `[POST] /signup` : Create a new user
 - `[POST] /signin` : Sign in a user
 
-Better documentation can be found [here](https://github.com/leomotta121/VUTTR/blob/master/docs/output.html). Download the html file and open on your browser or read the [Markdown](https://github.com/leomotta121/VUTTR/blob/master/docs/documentation.apib).
+Better documentation can be found [here](https://github.com/leomotta121/VUTTR-BOSSABOX/blob/master/server/docs/output.html). Download the html file and open on your browser or read the [Markdown](https://github.com/leomotta121/VUTTR-BOSSABOX/blob/master/server/docs/documentation.apib).
