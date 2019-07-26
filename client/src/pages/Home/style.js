@@ -16,7 +16,7 @@ const StyledMain = styled.main`
 
   .error-message {
     text-align: center;
-    margin: 2.4em 0;
+    /* margin: 2.4em 0; */
   }
 
   .pagination-container {
